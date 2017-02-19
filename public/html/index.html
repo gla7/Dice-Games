@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" ng-app="app">
+<head>
+  <meta charset="utf-8">
+  <title>Challenge</title>
+  <link rel="icon" href="public/assets/dice.png">
+  <link rel="stylesheet" href="public/css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.8/angular.js" type="text/javascript"></script>
+  <script src="public/js/app.js"></script>
+</head>
+<body ng-controller="controller">
+	<div class="coverContainer">
+		<img ng-src="public/assets/dice.png" class="coverImage"/>
+		<b class="coverTitle">DEY SEE ME ROLLIN'...</b>
+	</div>
+	<button ng-click="displayInstructions()" class="displayInstructionsButton">{{showInstructions ? "Click here to hide instructions!" : "Click here to read how to play!"}}</button>
+	<div ng-show="showInstructions" class="instructions">
+		HERE ARE THE INSTRUCTIONS
+	</div>
+	<div class="additionModeTogglerContainer">
+		<button ng-click="toggleAdditionMode()">{{additionModeButtonText}}</button>
+	</div>
+	<form ng-submit="submitButton(diceExpression)" class="expressionEntry" ng-show="!additionMode">
+		<input type="text" ng-model="diceExpression"/>
+		<button type="submit">Lez git rollin'!</button>
+	</form>
+	<div ng-show="additionMode" class="additionModeInputContainer">
+		<input type="text" ng-model="diceAdditionExpression"/>
+		<button ng-click="addOrSubtract(diceAdditionExpression, '+')">Add!</button>
+		<button ng-click="addOrSubtract(diceAdditionExpression, '-')">Subtract!</button>
+		<button ng-click="clear()">Clear!</button>
+	</div>
+	<div class="error" ng-show="showError">
+		<b>{{!additionMode ? outcome.error : additionOutcome.error}}</b>
+	</div>
+	<div class="outcome" ng-show="showOutcome && !additionMode">
+		From {{outcome.expressionEvaluated}}, we get the following outcome: {{outcome.result}}
+		<ul>
+			<li ng-repeat="step in outcome.stepByStepEvaluation track by $index"><img ng-src="public/assets/diceLogo.png" class="miniDiceImage"> {{step}}</li>
+		</ul>
+	</div>
+	<div class="additionModeOutput" ng-show="showAdditionModeOutcome && additionMode">
+		{{additionOutcome.runningOperation}} {{additionOutcome.runningOperation ? "=" : ""}}
+		{{additionOutcome.runningTotal}}
+	</div>
+</body>
+</html>
