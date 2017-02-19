@@ -1,3 +1,8 @@
+//testing
+var polynomial = require('polynomial')
+// console.log(polynomial("4x+3x^2").pow(2))
+//testing
+
 function sampleGet (req, res) {
 	res.send("THIS IS THE SAMPLE GET!!!")
 }
@@ -108,6 +113,9 @@ function rollTheDiceByExpression (expression) {
 		error: null,
 		result: null,
 		stepByStepEvaluation: null,
+		//testing
+		odds: null,
+		//testing
 	}
 	var expressionDecomposed = decomposeExpression(expression)
 	if (!expressionDecomposed || expression.length !== expressionDecomposed.join("").length) {
@@ -118,6 +126,10 @@ function rollTheDiceByExpression (expression) {
 		if (!isNaN(Number(expressionDecomposed[0]))) {
 			diceRollDetails.result = Number(expressionDecomposed[0])
 			diceRollDetails.stepByStepEvaluation = [expression + ": " + diceRollDetails.result]
+			//testing
+			diceRollDetails.odds = {}
+			diceRollDetails.odds[diceRollDetails.result] = 1
+			//testing
 			return diceRollDetails
 		}
 		diceRollDetails.error = "For a literal value case, please enter a non-negative integer. See examples above."
@@ -129,6 +141,12 @@ function rollTheDiceByExpression (expression) {
 		}
 		diceRollDetails.result = getRollOfAnXSidedDie(Number(expressionDecomposed[1]))
 		diceRollDetails.stepByStepEvaluation = [expression + ": " + diceRollDetails.result]
+		//testing
+		diceRollDetails.odds = {}
+		for (var i = 0; i < Number(expressionDecomposed[1]); i++) {
+			diceRollDetails.odds[i+1] = 1/Number(expressionDecomposed[1])
+		}
+		//testing
 		return diceRollDetails
   } else {
 		var isInvalidExpression = false
@@ -152,6 +170,17 @@ function rollTheDiceByExpression (expression) {
     if (expressionDecomposed.length === 3) {
     	diceRollDetails.result = getSumOfRolls(rolls)
     	diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfExpression(expression, rolls, "simple")
+    	//testing
+    	diceRollDetails.odds = {}
+    	var polynomialString = ""
+    	for (var i = 0; i < facesInDice; i++) {
+    		polynomialString = polynomialString === "" ? polynomialString + "x^" + (i + 1) : polynomialString + "+x^" + (i + 1)
+    	}
+    	var polynomialCoefficients = polynomial(polynomialString).pow(numberOfDice).coeff
+    	for (coefficient in polynomialCoefficients) {
+    		diceRollDetails.odds[coefficient] = polynomialCoefficients[coefficient]/Math.pow(facesInDice, numberOfDice)
+    	}
+    	//testing
     	return diceRollDetails
     } else if (expressionDecomposed.length === 5) {
     	var gamePlayed = expressionDecomposed[3]
