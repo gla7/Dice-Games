@@ -27,10 +27,6 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 		$scope.showInstructions = !$scope.showInstructions
 	}
 
-	$http.get('/sampleGet').then(function (response, error) {
-		$scope.sampleCallbackedVariable = response.data
-	})
-
 	$scope.diceExpression = ''
 	$scope.diceAdditionExpression = ''
 	var unallowedCharacters = ['/', '.', '?', '#', '%', '\\']
@@ -85,7 +81,7 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 			if (plusOrMinus === "+") {
 				var runningOperation = $scope.additionOutcome.runningOperation
 				var runningTotal = $scope.additionOutcome.runningTotal
-				$http.get('/diceExpression/' + diceExpression).then(function (response, error) {
+				$http.get('/diceExpression/addition/' + diceExpression).then(function (response, error) {
 					$scope.additionOutcome = response.data.outcome
 					$scope.diceAdditionExpression = ''
 					if ($scope.additionOutcome.error) {
@@ -104,7 +100,7 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 			} else {
 				var runningOperation = $scope.additionOutcome.runningOperation
 				var runningTotal = $scope.additionOutcome.runningTotal
-				$http.get('/diceExpression/' + diceExpression).then(function (response, error) {
+				$http.get('/diceExpression/addition/' + diceExpression).then(function (response, error) {
 					$scope.additionOutcome = response.data.outcome
 					$scope.diceAdditionExpression = ''
 					if ($scope.additionOutcome.error) {

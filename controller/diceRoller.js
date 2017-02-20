@@ -1,21 +1,16 @@
-//testing
+// requires
 var polynomial = require('polynomial')
-//testing
 
-function sampleGet (req, res) {
-	res.send("THIS IS THE SAMPLE GET!!!")
-}
 
-function homePage (req, res) {
-	res.sendFile('/index.html',{root : "./public/html/"})
-}
 
-function diceExpression (req, res) {
-	res.send({ outcome: rollTheDiceByExpression(req.params.diceExpression, false) })
-}
 
-// MAIN FUNCTION
 
+
+
+
+
+
+// helper functions
 Array.prototype.min = function() {
 	return Math.min.apply(null, this)
 }
@@ -105,74 +100,36 @@ function getExplosiveRolls (rolls, explosionThreshold, expressionDecomposed, fac
 	return explode(rolls, 0, explosionThreshold, expressionDecomposed, facesInDice)
 }
 
-//testing COMPLEX
-// function factorial (n) {
-// 	if (n <= 1) {
-// 		return 1
-// 	}
-// 	return n*factorial(n-1)
-// }
+function getApproximateOddsForExpression (expression) {
+	var probabilities = {}
+	for (var i = 0; i < 25001; i++) {
+		if (probabilities[rollTheDiceByExpression(expression, true).result]) {
+			probabilities[rollTheDiceByExpression(expression, true).result] = probabilities[rollTheDiceByExpression(expression, true).result] + 1/25000
+		} else {
+			probabilities[rollTheDiceByExpression(expression, true).result] = 1/25000
+		}
+	}
+	return probabilities
+}
 
-// function gamma(n) {  // accurate to about 15 decimal places
-//   //some magic constants 
-//   var g = 7, // g represents the precision desired, p is the values of p[i] to plug into Lanczos' formula
-//       p = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
-//   if(n < 0.5) {
-//     return Math.PI / Math.sin(n * Math.PI) / gamma(1 - n);
-//   }
-//   else {
-//     n--;
-//     var x = p[0];
-//     for(var i = 1; i < g + 2; i++) {
-//       x += p[i] / (n + i);
-//     }
-//     var t = n + g + 0.5;
-//     return Math.sqrt(2 * Math.PI) * Math.pow(t, (n + 0.5)) * Math.exp(-t) * x;
-//   }
-// }
 
-// function factorial(n) {
-//   return gamma(n + 1);
-// }
 
-// function binomialCoefficient (n, k) {
-// 	return (factorial(n))/(factorial(n - k)*factorial(k))
-// }
 
-// function nFunction (b, c, d) {
-// 	if (b === 0 && c === 0) {
-// 		return 1
-// 	}
-// 	var runningSum = 0
-// 	for (var k = 0; k < c + 1; k++) {
-// 		runningSum = runningSum + Math.pow(-1, k)*binomialCoefficient(c, k)*binomialCoefficient(b - (k*(d + 1)) + c - 1, c - 1)
-// 	}
-// 	return runningSum
-// }
 
-// function waysToSumSFromKHighestOfNXSidedDice (S, K, N, X) {
-// 	var runningWays = 0
-// 	for (var r = 1; r < X + 1; r++) {
-// 		for (var i = 0; i < N - K + 1; i++) {
-// 			for (var j = N - K - i + 1; j < N - i + 1; j++) {
-// 				runningWays = runningWays + ((factorial(N)*Math.pow(r - 1, i))/(factorial(i)*factorial(j)*factorial(N - i - j)))*nFunction(S + i + j - N - r*K, N - i - j, X - r - 1)
-// 			}
-// 		}
-// 	}
-// 	return runningWays
-// }
-//testing COMPLEX
 
-function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
+
+
+
+
+// main API function
+function rollTheDiceByExpression (expression, isGeneratingProbabilities, isAddition) {
 	console.log("typeof ", typeof expression, " expression ", expression)
 	var diceRollDetails = {
 		expressionEvaluated: expression,
 		error: null,
 		result: null,
 		stepByStepEvaluation: null,
-		//testing
 		odds: null,
-		//testing
 	}
 	var expressionDecomposed = decomposeExpression(expression)
 	if (!expressionDecomposed || expression.length !== expressionDecomposed.join("").length) {
@@ -183,10 +140,8 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 		if (!isNaN(Number(expressionDecomposed[0]))) {
 			diceRollDetails.result = Number(expressionDecomposed[0])
 			diceRollDetails.stepByStepEvaluation = [expression + ": " + diceRollDetails.result]
-			//testing
 			diceRollDetails.odds = {}
 			diceRollDetails.odds[diceRollDetails.result] = 1
-			//testing
 			return diceRollDetails
 		}
 		diceRollDetails.error = "For a literal value case, please enter a non-negative integer. See examples above."
@@ -198,12 +153,10 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 		}
 		diceRollDetails.result = getRollOfAnXSidedDie(Number(expressionDecomposed[1]))
 		diceRollDetails.stepByStepEvaluation = [expression + ": " + diceRollDetails.result]
-		//testing
 		diceRollDetails.odds = {}
 		for (var i = 0; i < Number(expressionDecomposed[1]); i++) {
 			diceRollDetails.odds[i+1] = 1/Number(expressionDecomposed[1])
 		}
-		//testing
 		return diceRollDetails
   } else {
 		var isInvalidExpression = false
@@ -227,7 +180,6 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
     if (expressionDecomposed.length === 3) {
     	diceRollDetails.result = getSumOfRolls(rolls)
     	diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfExpression(expression, rolls, "simple")
-    	//testing
     	diceRollDetails.odds = {}
     	var polynomialString = ""
     	for (var i = 0; i < facesInDice; i++) {
@@ -237,22 +189,8 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
     	for (coefficient in polynomialCoefficients) {
     		diceRollDetails.odds[coefficient] = polynomialCoefficients[coefficient]/Math.pow(facesInDice, numberOfDice)
     	}
-    	//testing
     	return diceRollDetails
     } else if (expressionDecomposed.length === 5) {
-    	//testing
-    	if (!isGeneratingProbabilities) {
-    		var probabilities = {}
-    		for (var i = 0; i < 25001; i++) {
-    			if (probabilities[rollTheDiceByExpression(expression, true).result]) {
-    				probabilities[rollTheDiceByExpression(expression, true).result] = probabilities[rollTheDiceByExpression(expression, true).result] + 1/25000
-    			} else {
-    				probabilities[rollTheDiceByExpression(expression, true).result] = 1/25000
-    			}
-    		}
-    		diceRollDetails.odds = probabilities
-    	}
-    	//testing
     	var gamePlayed = expressionDecomposed[3]
 			if (gamePlayed === 'd') {
 				var resultsDropped = Number(expressionDecomposed[4])
@@ -270,6 +208,7 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
         }
         diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfExpression(expression, originalRolls, "drop", indecesOflowestRolls)
         diceRollDetails.result = getSumOfRolls(rolls)
+        diceRollDetails.odds = (!isGeneratingProbabilities && !isAddition && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
         return diceRollDetails
 			} else if (gamePlayed === 'k') {
 				var resultsKept = Number(expressionDecomposed[4])
@@ -288,6 +227,7 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 				}
 				diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfExpression(expression, originalRolls, "keep", indecesOfHighestRolls)
 				diceRollDetails.result = getSumOfRolls(highestRolls)
+				diceRollDetails.odds = (!isGeneratingProbabilities && !isAddition && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
 				return diceRollDetails
 			} else if (gamePlayed === 'x') {
 				var explosionThreshold = Number(expressionDecomposed[4])
@@ -298,6 +238,7 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 				var explosiveRolls = getExplosiveRolls(rolls, explosionThreshold, expressionDecomposed, facesInDice)
 				diceRollDetails.stepByStepEvaluation = explosiveRolls.steps
 				diceRollDetails.result = explosiveRolls.runningSum
+				diceRollDetails.odds = (!isGeneratingProbabilities && !isAddition && numberOfDice <= 5 && (explosionThreshold/facesInDice) >= 0.75) ? getApproximateOddsForExpression(expression) : null
 				return diceRollDetails
 			} else {
 				diceRollDetails.error = "To play drop, keep, or explode, please use 'd', 'k' or 'x' respectively. See examples above."
@@ -310,10 +251,15 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
   }
 }
 
-// MAIN FUNCTION
 
+
+
+
+
+
+
+
+// exports
 module.exports = {
-	homePage: homePage,
-	sampleGet: sampleGet,
-	diceExpression: diceExpression,
+	rollTheDiceByExpression : rollTheDiceByExpression,
 }
