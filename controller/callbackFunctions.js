@@ -11,7 +11,7 @@ function homePage (req, res) {
 }
 
 function diceExpression (req, res) {
-	res.send({ outcome: rollTheDiceByExpression(req.params.diceExpression) })
+	res.send({ outcome: rollTheDiceByExpression(req.params.diceExpression, false) })
 }
 
 // MAIN FUNCTION
@@ -163,7 +163,7 @@ function getExplosiveRolls (rolls, explosionThreshold, expressionDecomposed, fac
 // }
 //testing COMPLEX
 
-function rollTheDiceByExpression (expression) {
+function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 	console.log("typeof ", typeof expression, " expression ", expression)
 	var diceRollDetails = {
 		expressionEvaluated: expression,
@@ -240,6 +240,19 @@ function rollTheDiceByExpression (expression) {
     	//testing
     	return diceRollDetails
     } else if (expressionDecomposed.length === 5) {
+    	//testing
+    	if (!isGeneratingProbabilities) {
+    		var probabilities = {}
+    		for (var i = 0; i < 25001; i++) {
+    			if (probabilities[rollTheDiceByExpression(expression, true).result]) {
+    				probabilities[rollTheDiceByExpression(expression, true).result] = probabilities[rollTheDiceByExpression(expression, true).result] + 1/25000
+    			} else {
+    				probabilities[rollTheDiceByExpression(expression, true).result] = 1/25000
+    			}
+    		}
+    		diceRollDetails.odds = probabilities
+    	}
+    	//testing
     	var gamePlayed = expressionDecomposed[3]
 			if (gamePlayed === 'd') {
 				var resultsDropped = Number(expressionDecomposed[4])

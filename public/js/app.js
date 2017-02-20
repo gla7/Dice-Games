@@ -44,8 +44,10 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 			}
 		})
 		if (allowed && diceExpression !== '') {
+			$scope.showGIF = true
 			$http.get('/diceExpression/' + diceExpression).then(function (response, error) {
 				console.log("OUTCOME: ", response.data.outcome)
+				$scope.showGIF = false
 				$scope.outcome = response.data.outcome
 				if ($scope.outcome.error) {
 					$scope.showError = true

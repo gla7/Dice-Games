@@ -87,6 +87,13 @@ body {
   right: 45.5%;
 }
 
+.gif {
+	padding: 50px;
+	height: 200px;
+	width: 175px;
+	border-radius: 50%;
+}
+
 li {
     list-style-type: none;
 }

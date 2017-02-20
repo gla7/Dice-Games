@@ -32,14 +32,15 @@
 		<button ng-click="addOrSubtract(diceAdditionExpression, '-')">Subtract!</button>
 		<button ng-click="clear()">Clear!</button>
 	</div>
+	<img ng-src="public/assets/diceRoll.gif" ng-show="showGIF" class="gif">
 	<div class="error" ng-show="showError">
 		<b>{{!additionMode ? outcome.error : additionOutcome.error}}</b>
 	</div>
-	<div class="probabilityChartContainer" ng-show="showOutcome && !additionMode">
+	<div class="probabilityChartContainer" ng-show="showOutcome && !additionMode && !showGIF">
 		<b class="middleOfChartText">ODDS</b>
   	<canvas id="doughnut" class="chart chart-doughnut"chart-data="data" chart-labels="labels"></canvas>
   </div>
-	<div class="outcome" ng-show="showOutcome && !additionMode">
+	<div class="outcome" ng-show="showOutcome && !additionMode && !showGIF">
 		From {{outcome.expressionEvaluated}}, we get the following outcome: {{outcome.result}} ({{(outcome.odds[outcome.result]*100).toFixed(2)}}% chance)
 		<ul>
 			<li ng-repeat="step in outcome.stepByStepEvaluation track by $index"><img ng-src="public/assets/diceLogo.png" class="miniDiceImage"> {{step}}</li>
