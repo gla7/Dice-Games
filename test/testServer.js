@@ -29,7 +29,7 @@ describe("Dice API", function () {
 		var nonNegativeInteger = Math.round(Math.random()*limitOfLiteralValueCase)
 		it("LITERAL VALUE CASE (test number " + (i + 1) + " of " + numberOfTestsInEachCase + "): should get status 200, no error message, and a result of " + nonNegativeInteger + ",  when getting /diceExpression/" + nonNegativeInteger, function (done) {
 			chai.request(app)
-			.get("/diceExpression/" + nonNegativeInteger)
+			.get("/diceExpression/doNotGenerateProbabilities/" + nonNegativeInteger)
 			.end(function (err, res) {
 				should.equal(err, null)
 				res.should.have.status(200)
@@ -45,7 +45,7 @@ describe("Dice API", function () {
 		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
 		it("ONE DIE ROLL CASE (test number " + (i + 1) + " of " + numberOfTestsInEachCase + "): should get status 200, no error message, and a result between 1 and " + facesInDice + ",  when getting /diceExpression/d" + facesInDice, function (done) {
 			chai.request(app)
-			.get("/diceExpression/d" + facesInDice)
+			.get("/diceExpression/doNotGenerateProbabilities/d" + facesInDice)
 			.end(function (err, res) {
 				should.equal(err, null)
 				res.should.have.status(200)
@@ -62,7 +62,7 @@ describe("Dice API", function () {
 		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
 		it("DICE ROLL CASE (test number " + (i + 1) + " of " + numberOfTestsInEachCase + "): should get status 200, no error message, and a result between " + numberOfDice + " and " + facesInDice*numberOfDice + ",  when getting /diceExpression/" + numberOfDice + "d" + facesInDice, function (done) {
 			chai.request(app)
-			.get("/diceExpression/" + numberOfDice + "d" + facesInDice)
+			.get("/diceExpression/doNotGenerateProbabilities/" + numberOfDice + "d" + facesInDice)
 			.end(function (err, res) {
 				should.equal(err, null)
 				res.should.have.status(200)
@@ -80,7 +80,7 @@ describe("Dice API", function () {
 		var resultsDropped = randomNumberBetweenMAndN(0, numberOfDice - 1)
 		it("DROP LOWEST ROLLS CASE (test number " + (i + 1) + " of " + numberOfTestsInEachCase + "): should get status 200, no error message, and a result between " + (numberOfDice - resultsDropped) + " and " + facesInDice*(numberOfDice - resultsDropped) + ",  when getting /diceExpression/" + numberOfDice + "d" + facesInDice + "d" + resultsDropped, function (done) {
 			chai.request(app)
-			.get("/diceExpression/" + numberOfDice + "d" + facesInDice + "d" + resultsDropped)
+			.get("/diceExpression/doNotGenerateProbabilities/" + numberOfDice + "d" + facesInDice + "d" + resultsDropped)
 			.end(function (err, res) {
 				should.equal(err, null)
 				res.should.have.status(200)
@@ -98,7 +98,7 @@ describe("Dice API", function () {
 		var resultsKept = randomNumberBetweenMAndN(1, numberOfDice)
 		it("KEEP HIGHEST ROLLS CASE (test number " + (i + 1) + " of " + numberOfTestsInEachCase + "): should get status 200, no error message, and a result between " + resultsKept + " and " + facesInDice*resultsKept + ",  when getting /diceExpression/" + numberOfDice + "d" + facesInDice + "k" + resultsKept, function (done) {
 			chai.request(app)
-			.get("/diceExpression/" + numberOfDice + "d" + facesInDice + "k" + resultsKept)
+			.get("/diceExpression/doNotGenerateProbabilities/" + numberOfDice + "d" + facesInDice + "k" + resultsKept)
 			.end(function (err, res) {
 				should.equal(err, null)
 				res.should.have.status(200)
@@ -113,10 +113,10 @@ describe("Dice API", function () {
 	for (var i = 0; i < numberOfTestsInEachCase; i++) {
 		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
 		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
-		var explosionThreshold = randomNumberBetweenMAndN(2, numberOfDice)
+		var explosionThreshold = randomNumberBetweenMAndN(2, facesInDice)
 		it("EXPLOSIVE ROLLS CASE (test number " + (i + 1) + " of " + numberOfTestsInEachCase + "): should get status 200, no error message, and a result between " + numberOfDice + " and infinity,  when getting /diceExpression/" + numberOfDice + "d" + facesInDice + "x" + explosionThreshold, function (done) {
 			chai.request(app)
-			.get("/diceExpression/" + numberOfDice + "d" + facesInDice + "x" + explosionThreshold)
+			.get("/diceExpression/doNotGenerateProbabilities/" + numberOfDice + "d" + facesInDice + "x" + explosionThreshold)
 			.end(function (err, res) {
 				should.equal(err, null)
 				res.should.have.status(200)

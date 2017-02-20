@@ -32,9 +32,9 @@ app.use(express.static(__dirname))
 // endpoints
 app.get("/", endpointHandlers.homePage)
 
-app.get("/diceExpression/:diceExpression", endpointHandlers.diceExpression)
+app.get("/diceExpression/generateProbabilities/:diceExpression", endpointHandlers.diceExpressionWithProbabilities)
 
-app.get("/diceExpression/addition/:diceExpression", endpointHandlers.diceExpressionAddition)
+app.get("/diceExpression/doNotGenerateProbabilities/:diceExpression", endpointHandlers.diceExpressionNoProbabilities)
 
 
 

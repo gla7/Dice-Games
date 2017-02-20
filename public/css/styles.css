@@ -24,6 +24,32 @@ body {
 	font-size: 40px;
 }
 
+button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-appearance: button;
+  -webkit-user-select: none;
+ 	-moz-user-select: none;
+  -ms-user-select: none;
+}
+
+button:focus {outline:0;}
+
+.buttonStyle {
+	font-size: 15px;
+	cursor: pointer;
+	box-shadow: 1.5px 1.5px 0.75px #888888;
+	border-radius: 7.5%;
+	border: 1px solid #888888;
+	background-color: white;
+	padding: 3px;
+}
+
 .displayInstructionsButton {
 	margin-bottom: 50px;
 }
@@ -42,6 +68,12 @@ body {
 
 .additionModeInputContainer {
 	margin-bottom: 50px;
+}
+
+.checkboxText {
+	font-size: 13px;
+	padding-left: 20px;
+	padding-right: 20px;
 }
 
 .additionModeOutput {

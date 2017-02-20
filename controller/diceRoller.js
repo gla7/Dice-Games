@@ -41,37 +41,52 @@ function cloneArray (array) {
 
 function getStepByStepEvaluationOfExpression (expression, rolls, useCase, indecesOflowestOrHighestRolls) {
 	var expressionDecomposed = decomposeExpression(expression)
-	var allSteps = ""
+	// var allSteps = ""
 	var numberOfDice = expressionDecomposed[0]
 	expressionDecomposed.splice(0, 1)
 	if (useCase === "simple") {
-		for (var i = 0; i < numberOfDice; i++) {
-			allSteps = allSteps + " 1" + expressionDecomposed.join("")
-		}
-		allSteps = allSteps.trim().split(" ")
-	  return allSteps.map(function (step, stepIndex) {
-	  	return step + ": " + rolls[stepIndex]
-	  })
+		//testing
+		return rolls.map(function (roll) {
+			return 1 + expressionDecomposed.join("") + ": " + roll
+		})
+		//testing
+		// for (var i = 0; i < numberOfDice; i++) {
+		// 	allSteps = allSteps + " 1" + expressionDecomposed.join("")
+		// }
+		// allSteps = allSteps.trim().split(" ")
+	 //  return allSteps.map(function (step, stepIndex) {
+	 //  	return step + ": " + rolls[stepIndex]
+	 //  })
 	} else if (useCase === "drop") {
 		expressionDecomposed.pop()
 		expressionDecomposed.pop()
-		for (var i = 0; i < numberOfDice; i++) {
-			allSteps = allSteps + " 1" + expressionDecomposed.join("")
-		}
-		allSteps = allSteps.trim().split(" ")
-	  return allSteps.map(function (step, stepIndex) {
-	  	return indecesOflowestOrHighestRolls.includes(stepIndex) ? step + ": " + rolls[stepIndex] + " => dropped" : step + ": " + rolls[stepIndex] + " => kept"
-	  })
+		//testing
+		return rolls.map(function (roll, rollIndex) {
+			return indecesOflowestOrHighestRolls.includes(rollIndex) ? (1 + expressionDecomposed.join("")) + ": " + roll + " => dropped" : (1 + expressionDecomposed.join("")) + ": " + roll + " => kept"
+		})
+		//testing
+		// for (var i = 0; i < numberOfDice; i++) {
+		// 	allSteps = allSteps + " 1" + expressionDecomposed.join("")
+		// }
+		// allSteps = allSteps.trim().split(" ")
+	 //  return allSteps.map(function (step, stepIndex) {
+	 //  	return indecesOflowestOrHighestRolls.includes(stepIndex) ? step + ": " + rolls[stepIndex] + " => dropped" : step + ": " + rolls[stepIndex] + " => kept"
+	 //  })
 	} else if (useCase === "keep") {
 		expressionDecomposed.pop()
 		expressionDecomposed.pop()
-		for (var i = 0; i < numberOfDice; i++) {
-			allSteps = allSteps + " 1" + expressionDecomposed.join("")
-		}
-		allSteps = allSteps.trim().split(" ")
-	  return allSteps.map(function (step, stepIndex) {
-	  	return indecesOflowestOrHighestRolls.includes(stepIndex) ? step + ": " + rolls[stepIndex] + " => kept" : step + ": " + rolls[stepIndex] + " => dropped"
-	  })
+		//testing
+		return rolls.map(function (roll, rollIndex) {
+			return indecesOflowestOrHighestRolls.includes(rollIndex) ? (1 + expressionDecomposed.join("")) + ": " + roll + " => kept" : (1 + expressionDecomposed.join("")) + ": " + roll + " => dropped"
+		})
+		//testing
+		// for (var i = 0; i < numberOfDice; i++) {
+		// 	allSteps = allSteps + " 1" + expressionDecomposed.join("")
+		// }
+		// allSteps = allSteps.trim().split(" ")
+	 //  return allSteps.map(function (step, stepIndex) {
+	 //  	return indecesOflowestOrHighestRolls.includes(stepIndex) ? step + ": " + rolls[stepIndex] + " => kept" : step + ": " + rolls[stepIndex] + " => dropped"
+	 //  })
 	} 
 }
 
@@ -79,8 +94,6 @@ function getExplosiveRolls (rolls, explosionThreshold, expressionDecomposed, fac
 	var runningSum = 0
 	var steps = []
 	function explode (array, index, threshold, expressionDecomposed, facesInDice) {
-		console.log("running sum ", runningSum)
-		console.log("array is ", array, " and index is ", index, " and threshold is ", threshold)
 		if (!array[index]) {
 			return {
 				runningSum: runningSum,
@@ -122,8 +135,7 @@ function getApproximateOddsForExpression (expression) {
 
 
 // main API function
-function rollTheDiceByExpression (expression, isGeneratingProbabilities, isAddition) {
-	console.log("typeof ", typeof expression, " expression ", expression)
+function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 	var diceRollDetails = {
 		expressionEvaluated: expression,
 		error: null,
@@ -176,7 +188,6 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities, isAddit
 		for (var i = 0; i < numberOfDice; i++) {
 			rolls.push(getRollOfAnXSidedDie(facesInDice))
 		}
-		console.log(rolls)
     if (expressionDecomposed.length === 3) {
     	diceRollDetails.result = getSumOfRolls(rolls)
     	diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfExpression(expression, rolls, "simple")
@@ -208,7 +219,7 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities, isAddit
         }
         diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfExpression(expression, originalRolls, "drop", indecesOflowestRolls)
         diceRollDetails.result = getSumOfRolls(rolls)
-        diceRollDetails.odds = (!isGeneratingProbabilities && !isAddition && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
+        diceRollDetails.odds = (!isGeneratingProbabilities && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
         return diceRollDetails
 			} else if (gamePlayed === 'k') {
 				var resultsKept = Number(expressionDecomposed[4])
@@ -227,7 +238,7 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities, isAddit
 				}
 				diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfExpression(expression, originalRolls, "keep", indecesOfHighestRolls)
 				diceRollDetails.result = getSumOfRolls(highestRolls)
-				diceRollDetails.odds = (!isGeneratingProbabilities && !isAddition && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
+				diceRollDetails.odds = (!isGeneratingProbabilities && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
 				return diceRollDetails
 			} else if (gamePlayed === 'x') {
 				var explosionThreshold = Number(expressionDecomposed[4])
@@ -238,7 +249,7 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities, isAddit
 				var explosiveRolls = getExplosiveRolls(rolls, explosionThreshold, expressionDecomposed, facesInDice)
 				diceRollDetails.stepByStepEvaluation = explosiveRolls.steps
 				diceRollDetails.result = explosiveRolls.runningSum
-				diceRollDetails.odds = (!isGeneratingProbabilities && !isAddition && numberOfDice <= 5 && (explosionThreshold/facesInDice) >= 0.75) ? getApproximateOddsForExpression(expression) : null
+				diceRollDetails.odds = (!isGeneratingProbabilities && numberOfDice <= 5 && (explosionThreshold/facesInDice) >= 0.5) ? getApproximateOddsForExpression(expression) : null
 				return diceRollDetails
 			} else {
 				diceRollDetails.error = "To play drop, keep, or explode, please use 'd', 'k' or 'x' respectively. See examples above."

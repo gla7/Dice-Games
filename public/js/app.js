@@ -9,7 +9,8 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 	$scope.showOutcome = false
 	$scope.additionMode = false
 	$scope.showAdditionModeOutcome = false
-	$scope.additionModeButtonText = "Click here to enable addition mode!"
+	$scope.generateProbabilities = false
+	$scope.additionModeButtonText = "Click here to enable addition mode"
 	$scope.outcome = {}
 	$scope.additionOutcome = {}
 
@@ -17,9 +18,9 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 		$scope.additionMode = !$scope.additionMode
 		$scope.showError = false
 		if ($scope.additionMode) {
-			$scope.additionModeButtonText = "Click here to enable normal mode!"
+			$scope.additionModeButtonText = "Click here to enable normal mode"
 		} else {
-			$scope.additionModeButtonText = "Click here to enable addition mode!"
+			$scope.additionModeButtonText = "Click here to enable addition mode"
 		}
 	}
 
@@ -40,8 +41,11 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 			}
 		})
 		if (allowed && diceExpression !== '') {
+			$scope.showError = false
 			$scope.showGIF = true
-			$http.get('/diceExpression/' + diceExpression).then(function (response, error) {
+			console.log("THE CHECKBOX IS: ", $scope.generateProbabilities)
+			var generatedProbabilitiesString = $scope.generateProbabilities ? "generateProbabilities" : "doNotGenerateProbabilities"
+			$http.get('/diceExpression/' + generatedProbabilitiesString + '/' + diceExpression).then(function (response, error) {
 				console.log("OUTCOME: ", response.data.outcome)
 				$scope.showGIF = false
 				$scope.outcome = response.data.outcome
@@ -81,7 +85,8 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 			if (plusOrMinus === "+") {
 				var runningOperation = $scope.additionOutcome.runningOperation
 				var runningTotal = $scope.additionOutcome.runningTotal
-				$http.get('/diceExpression/addition/' + diceExpression).then(function (response, error) {
+				console.log("THE CHECKBOX IS: ", $scope.generateProbabilities)
+				$http.get('/diceExpression/doNotGenerateProbabilities/' + diceExpression).then(function (response, error) {
 					$scope.additionOutcome = response.data.outcome
 					$scope.diceAdditionExpression = ''
 					if ($scope.additionOutcome.error) {
@@ -100,7 +105,7 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 			} else {
 				var runningOperation = $scope.additionOutcome.runningOperation
 				var runningTotal = $scope.additionOutcome.runningTotal
-				$http.get('/diceExpression/addition/' + diceExpression).then(function (response, error) {
+				$http.get('/diceExpression/doNotGenerateProbabilities/' + diceExpression).then(function (response, error) {
 					$scope.additionOutcome = response.data.outcome
 					$scope.diceAdditionExpression = ''
 					if ($scope.additionOutcome.error) {
