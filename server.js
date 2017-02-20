@@ -50,3 +50,17 @@ var port = 3000
 app.listen(port, function() {
 	console.log("Your server is up at port " + port)
 })
+
+
+
+
+
+
+
+
+
+
+// exports
+module.exports = {
+	app: app,
+}

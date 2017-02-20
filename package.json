@@ -4,7 +4,7 @@
   "description": "A dice game",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "start": "node server.js"
   },
   "author": "Gabriel Leon",
@@ -12,9 +12,12 @@
   "dependencies": {
     "angular-chart.js": "^1.1.1",
     "body-parser": "^1.16.1",
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
     "chart.js": "^2.5.0",
     "cors": "^2.8.1",
     "express": "^4.14.1",
+    "mocha": "^3.2.0",
     "polynomial": "^1.1.0"
   }
 }
