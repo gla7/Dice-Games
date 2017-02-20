@@ -1,6 +1,5 @@
 //testing
 var polynomial = require('polynomial')
-// console.log(polynomial("4x+3x^2").pow(2))
 //testing
 
 function sampleGet (req, res) {

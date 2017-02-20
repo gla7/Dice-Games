@@ -1,5 +1,4 @@
-// this is the front end js file
-var app = angular.module('app',[])
+var app = angular.module('app',["chart.js"])
 
 app.controller('controller',['$scope', '$http', function ($scope, $http) {
 
@@ -54,6 +53,14 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 				} else {
 					$scope.showError = false
 					$scope.showOutcome = true
+					//testing
+					$scope.labels = []
+  				$scope.data = []
+  				for (odd in $scope.outcome.odds) {
+  					$scope.labels.push(odd)
+  					$scope.data.push(($scope.outcome.odds[odd]*100))
+  				}
+					//testing
 				}
 				$scope.diceExpression = ''
 			})
@@ -82,7 +89,6 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 					if ($scope.additionOutcome.error) {
 						$scope.showError = true
 						$scope.showAdditionModeOutcome = false
-						// $scope.additionOutcome = {}
 					} else {
 						$scope.additionOutcome.runningOperation = (runningOperation ? runningOperation : "") + " + (" + $scope.additionOutcome.stepByStepEvaluation.map(function (step) {
 							return step.includes("dropped") ? "(" + step.split(":")[0] + " dropped)" : step.split(":")[0]
@@ -102,7 +108,6 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 					if ($scope.additionOutcome.error) {
 						$scope.showError = true
 						$scope.showAdditionModeOutcome = false
-						// $scope.additionOutcome = {}
 					} else {
 						$scope.additionOutcome.runningOperation = (runningOperation ? runningOperation : "") + " - (" + $scope.additionOutcome.stepByStepEvaluation.map(function (step) {
 							return step.includes("dropped") ? "(" + step.split(":")[0] + " dropped)" : step.split(":")[0]
@@ -128,5 +133,8 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 		$scope.additionOutcome = {}
 		$scope.showError = false
 	}
+
+ 	$scope.labels = ["Initialized"]
+  $scope.data = [100]
 
 }])

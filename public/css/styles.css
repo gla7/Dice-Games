@@ -58,9 +58,11 @@ body {
 }
 
 .outcome {
+	display: inline-block;
 	margin-top: 50px;
-	margin-left: 5%;
+	/*margin-left: 5%;*/
 	margin-right: 5%; 
+	vertical-align: top;
 }
 
 .miniDiceImage {
@@ -70,6 +72,50 @@ body {
 	vertical-align: bottom;
 }
 
+.probabilityChartContainer {
+	display: inline-block;
+	vertical-align: middle;
+	padding-top: 62px;
+	position: relative;
+	width: 55%;
+}
+
+.middleOfChartText {
+	position: absolute;
+  font-size: 15px;
+  top: 57%;
+  right: 45.5%;
+}
+
 li {
     list-style-type: none;
+}
+
+@media (min-width: 950px) {
+  .middleOfChartText {
+	  font-size: 25px;
+    top: 54%;
+    right: 44%;
+	}
+}
+
+@media (min-width: 1300px) {
+  .middleOfChartText {
+	  font-size: 30px;
+    top: 53%;
+    right: 44%;
+	}
+}
+
+@media (max-width: 830px) {
+  .middleOfChartText {
+	  top: 59%;
+	  right: 44.5%;
+	}
+}
+
+@media (max-width: 700px) {
+  .middleOfChartText {
+	  display: none;
+	}
 }
