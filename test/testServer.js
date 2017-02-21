@@ -1,30 +1,37 @@
+// requires
 var chai = require('chai')
 var chaiHttp = require('chai-http')
 var server = require('../server.js')
 
+// needed by mocha/chai
 var should = chai.should()
 var expect = chai.expect
 var app = server.app
-
 chai.use(chaiHttp)
 
-function randomNumberBetweenMAndN (m, n) { return Math.floor(Math.random()*(n - m + 1)+m) }
+// helper functions
+function randomNumberBetweenMAndN (m, n) { return Math.floor(Math.random()*(n - m + 1) + m) }
 function generateRandomLetterString (length, charactersAvailable) {
-    var text = " "
-    for(var i = 0; i < length; i++) {
-        text = text + charactersAvailable.charAt(Math.floor(Math.random() * charactersAvailable.length))
-    }
-    return text.trim()
+  var text = " "
+  for(var i = 0; i < length; i++) {
+      text = text + charactersAvailable.charAt(Math.floor(Math.random() * charactersAvailable.length))
+  }
+  return text.trim()
 }
+
+// test parameters
 var numberOfTestsInEachCase = 10
 var limitOfLiteralValueCase = 100
 var limitOfFacesInDice = 100
 var limitOfNumberOfDice = 100
+
+// test generator helpers
 var notPermittedSymbols = "`~!@$^&*()-_=+[{]}|;:',<>".split("")
 var invalidLetters = "abcefghijlmnopqrstuvwyzQWERTYUIOPASFFGHJLZCVBNM"
 var numbers = "0123456789"
 var kdx = "kdx"
 
+// tests start here
 describe("HOMEPAGE LOAD", function () {
 	it("Test number 1 of 1: should get status 200 when getting the homepage", function (done) {
 		chai.request(app)
@@ -40,7 +47,7 @@ describe("HOMEPAGE LOAD", function () {
 describe("LITERAL VALUE CASE", function () {
 	for (var i = 0; i < numberOfTestsInEachCase; i++) {
 		var nonNegativeInteger = Math.round(Math.random()*limitOfLiteralValueCase)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result of " + nonNegativeInteger + ",  when getting /diceExpression/testEndpoint/" + nonNegativeInteger, function (done) {
+		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result of " + nonNegativeInteger + ", when getting /diceExpression/testEndpoint/" + nonNegativeInteger, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + nonNegativeInteger)
 			.end(function (err, res) {
@@ -371,7 +378,7 @@ describe("DROP LOWEST ROLLS CASE", function () {
 		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
 		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
 		var resultsDropped = randomNumberBetweenMAndN(0, numberOfDice - 1)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result between " + (numberOfDice - resultsDropped) + " and " + facesInDice*(numberOfDice - resultsDropped) + ",  when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "d" + resultsDropped, function (done) {
+		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result between " + (numberOfDice - resultsDropped) + " and " + facesInDice*(numberOfDice - resultsDropped) + ", when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "d" + resultsDropped, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "d" + resultsDropped)
 			.end(function (err, res) {
@@ -409,7 +416,7 @@ describe("KEEP HIGHEST ROLLS CASE", function () {
 		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
 		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
 		var resultsKept = randomNumberBetweenMAndN(1, numberOfDice)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result between " + resultsKept + " and " + facesInDice*resultsKept + ",  when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "k" + resultsKept, function (done) {
+		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result between " + resultsKept + " and " + facesInDice*resultsKept + ", when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "k" + resultsKept, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "k" + resultsKept)
 			.end(function (err, res) {
@@ -460,7 +467,7 @@ describe("EXPLOSIVE ROLLS CASE", function () {
 		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
 		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
 		var explosionThreshold = randomNumberBetweenMAndN(2, facesInDice)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result between " + numberOfDice + " and infinity,  when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "x" + explosionThreshold, function (done) {
+		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result between " + numberOfDice + " and infinity, when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "x" + explosionThreshold, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "x" + explosionThreshold)
 			.end(function (err, res) {
