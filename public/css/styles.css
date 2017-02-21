@@ -56,6 +56,8 @@ button:focus {outline:0;}
 
 .instructions {
 	margin-bottom: 50px;
+	margin: auto;
+	width: 75%;
 }
 
 .additionModeTogglerContainer {
@@ -93,7 +95,6 @@ button:focus {outline:0;}
 .outcome {
 	display: inline-block;
 	margin-top: 50px;
-	/*margin-left: 5%;*/
 	margin-right: 5%; 
 	vertical-align: top;
 }

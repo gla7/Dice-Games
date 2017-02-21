@@ -124,9 +124,10 @@ var showError = {
 	multipleDiceRollCorrection: "For multiple dice, the expression should always begin with a positive integer followed by a 'd' followed by another positive integer. For example, the expression for 3 6-sided dice would be '3d6'. More examples above.",
 	dropCorrection: "Cannot drop as many or more results than there are available! See explanations above.",
 	keepCorrection: "Cannot keep zero results or more results than there are available! See explanations above.",
-	explosionCorrection: "Cannot have an explosion threshold at or below 1. This would result in an infinite operation! See explanations above.",
+	explosionCorrection: "Cannot have an explosion threshold at or below 1. This would result in an infinite operation! You also cannot have x above the number of faces. See explanations above.",
 	dKXCorrection: "To play drop, keep, or explode, please use 'd', 'k' or 'x' respectively. See examples above.",
 	tooMuchInput: "Something is wrong with your input (e.g. too much of it: '4d5d6d1'). See examples above.",
+	tooLargeANumber: "You have entered too large a number that may crash our server!",
 }
 
 
@@ -165,6 +166,9 @@ function rollTheDiceByExpression (expression, isEstimatingProbabilities, isTest)
 		if (Number(expressionDecomposed[1]) === 0 || expressionDecomposed[0] !== 'd') {
 			diceRollDetails.error = showError.singleDieRollCorrection
 			return diceRollDetails
+		} else if (Number(expressionDecomposed[1]) > 100000) {
+			diceRollDetails.error = showError.tooLargeANumber
+			return diceRollDetails
 		}
 		diceRollDetails.result = getRollOfAnXSidedDie(Number(expressionDecomposed[1]))
 		diceRollDetails.stepByStepEvaluation = [expression + ": " + diceRollDetails.result]
@@ -183,7 +187,10 @@ function rollTheDiceByExpression (expression, isEstimatingProbabilities, isTest)
 		if (isInvalidExpression || numberOfDice === 0 || facesInDice === 0 || characterPreceedingFacesInDice !== 'd') {
 			diceRollDetails.error = showError.multipleDiceRollCorrection
 			return diceRollDetails
-		}		
+		} else if (Number(expressionDecomposed[0]) > 100000 || Number(expressionDecomposed[2]) > 100000) {
+			diceRollDetails.error = showError.tooLargeANumber
+			return diceRollDetails
+		}	
 		var rolls = []
 		for (var i = 0; i < numberOfDice; i++) {
 			rolls.push(getRollOfAnXSidedDie(facesInDice))
@@ -234,7 +241,7 @@ function rollTheDiceByExpression (expression, isEstimatingProbabilities, isTest)
 				return diceRollDetails
 			} else if (gamePlayed === 'x') {
 				var explosionThreshold = Number(expressionDecomposed[4])
-				if (explosionThreshold <= 1) {
+				if (explosionThreshold <= 1 || explosionThreshold > facesInDice) {
 					diceRollDetails.error = showError.explosionCorrection
 					return diceRollDetails
 				}

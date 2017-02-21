@@ -185,7 +185,41 @@ describe("DICE ROLL CASE", function () {
 	}
 })
 
-describe("DICE ROLL CASE NOT WITH d IN THE MIDDLE", function () {
+describe("TOO LARGE NUMBER IN FACES", function () {
+	for (var i = 0; i < numberOfTestsInEachCase; i++) {
+		var facesInDice = randomNumberBetweenMAndN(100001, 1000000)
+		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
+		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a too large number error when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice, function (done) {
+			chai.request(app)
+			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice)
+			.end(function (err, res) {
+				should.equal(err, null)
+				res.should.have.status(200)
+				should.equal(res.body.outcome.error, "You have entered too large a number that may crash our server!")
+				done()
+			})
+		})
+	}
+})
+
+describe("TOO LARGE NUMBER IN NUMBER OF DICE", function () {
+	for (var i = 0; i < numberOfTestsInEachCase; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
+		var numberOfDice = randomNumberBetweenMAndN(100001, 1000000)
+		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a too large number error when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice, function (done) {
+			chai.request(app)
+			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice)
+			.end(function (err, res) {
+				should.equal(err, null)
+				res.should.have.status(200)
+				should.equal(res.body.outcome.error, "You have entered too large a number that may crash our server!")
+				done()
+			})
+		})
+	}
+})
+
+describe("INPUT IN WRONG ORDER CASE", function () {
 	for (var i = 0; i < numberOfTestsInEachCase; i++) {
 		var firstRandomNumber = randomNumberBetweenMAndN(1, 1000)
 		var secondRandomNumber = randomNumberBetweenMAndN(1, 1000)
@@ -451,7 +485,7 @@ describe("EXPLOSIVE ROLLS CASE WITH X = 1 OR BELOW", function () {
 			.end(function (err, res) {
 				should.equal(err, null)
 				res.should.have.status(200)
-				should.equal(res.body.outcome.error, "Cannot have an explosion threshold at or below 1. This would result in an infinite operation! See explanations above.")
+				should.equal(res.body.outcome.error, "Cannot have an explosion threshold at or below 1. This would result in an infinite operation! You also cannot have x above the number of faces. See explanations above.")
 				done()
 			})
 		})
