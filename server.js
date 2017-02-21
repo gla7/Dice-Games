@@ -36,6 +36,8 @@ app.get("/diceExpression/generateProbabilities/:diceExpression", endpointHandler
 
 app.get("/diceExpression/doNotGenerateProbabilities/:diceExpression", endpointHandlers.diceExpressionNoProbabilities)
 
+app.get("/diceExpression/testEndpoint/:diceExpression", endpointHandlers.diceExpressionTestEndpoint)
+
 
 
 

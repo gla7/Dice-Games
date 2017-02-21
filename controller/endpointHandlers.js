@@ -22,6 +22,10 @@ function diceExpressionNoProbabilities (req, res) {
 	res.send({ outcome: diceRoller.rollTheDiceByExpression(req.params.diceExpression, true) })
 }
 
+function diceExpressionTestEndpoint (req, res) {
+	res.send({ outcome: diceRoller.rollTheDiceByExpression(req.params.diceExpression, true, true) })
+}
+
 
 
 
@@ -35,4 +39,5 @@ module.exports = {
 	homePage: homePage,
 	diceExpressionWithProbabilities: diceExpressionWithProbabilities,
 	diceExpressionNoProbabilities: diceExpressionNoProbabilities,
+	diceExpressionTestEndpoint: diceExpressionTestEndpoint,
 }

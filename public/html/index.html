@@ -8,8 +8,11 @@
 
 
 
+
+
 <!-- begin html document and tie angular module to it-->
 <html lang="en" ng-app="app">
+
 
 
 
@@ -44,8 +47,10 @@
 
 
 
+
 	<!-- begin body and tie angular controller to it -->
 	<body ng-controller="controller">
+
 
 
 
@@ -69,11 +74,13 @@
 
 
 
+
 		<!-- instructions on how to use the app -->
 		<button ng-click="displayInstructions()" class="displayInstructionsButton buttonStyle">{{showInstructions ? "Click here to hide instructions" : "Click here to read how to play"}}</button>
 		<div ng-show="showInstructions" class="instructions">
 			HERE ARE THE INSTRUCTIONS
 		</div>
+
 
 
 
@@ -96,31 +103,35 @@
 
 
 
+
 		<!-- normal mode expression entry form and optional probability calculator for d, k and x -->
-		<form ng-submit="submitButton(diceExpression)" class="expressionEntry" ng-show="!showAdditionMode">
-			<input type="text" ng-model="diceExpression" placeholder="3d6 = 3 6-sided dice"/>
-			<button type="submit" class="buttonStyle">LEZ GIT ROLLIN'!</button>
-			<br/>
-			<br/>
-			<label class="checkboxText">Check to display approximate odds for (simple) drop (d), keep (k), and explode (x) cases:<input type="checkbox" ng-model="generateProbabilities"></label>
-			<br/>
-			<span class="checkboxText">... in all other cases odds will be shown by default. Odds for large cases of d, k, and x are not supported in this version.</span>
-		</form>
-
-
-
-
-
-
-
-
-
-		<!-- addition mode entry form -->
-		<div ng-show="showAdditionMode" class="additionModeInputContainer">
-			<input type="text" ng-model="diceAdditionExpression"/>
-			<button ng-click="addOrSubtract(diceAdditionExpression, '+')" class="buttonStyle">Add!</button>
-			<button ng-click="addOrSubtract(diceAdditionExpression, '-')" class="buttonStyle">Subtract!</button>
-			<button ng-click="clear()" class="buttonStyle">Clear!</button>
+		<div ng-show="!showAdditionMode">
+			<form ng-submit="rollTheDice(diceExpression)" class="expressionEntry">
+				<input type="text" ng-model="diceExpression" placeholder="3d6 = 3 6-sided dice"/>
+				<button type="submit" class="buttonStyle">LEZ GIT ROLLIN'!</button>
+				<br/>
+				<br/>
+				<label class="checkboxText">Check to display approximate odds for (simple) drop (d), keep (k), and explode (x) cases:<input type="checkbox" ng-model="generateProbabilities"></label>
+				<br/>
+				<span class="checkboxText">... in all other cases odds will be shown by default. Odds for large cases of d, k, and x are not supported in this version.</span>
+			</form>
+			<div ng-show="showNormalOutcome">
+				<!-- probability chart and result breakdown for normal mode -->
+				<div ng-show="!showLoadingGIF">
+					<div class="probabilityChartContainer" ng-show="outcome.odds">
+						<b class="middleOfChartText">ODDS</b>
+				  	<canvas id="doughnut" class="chart chart-doughnut"chart-data="data" chart-labels="labels"></canvas>
+				  </div>
+					<div class="outcome">
+						From {{outcome.expressionEvaluated}}, we get the following outcome: {{outcome.result}} {{outcome.odds ? ("(~" + (outcome.odds[outcome.result]*100).toFixed(2) + "% chance)") : ""}}
+						<ul>
+							<li ng-repeat="step in outcome.stepByStepEvaluation track by $index"><img ng-src="public/assets/diceLogo.png" class="miniDiceImage"> {{step}}</li>
+						</ul>
+					</div>
+				</div>
+				<!-- loading gif -->
+				<img ng-src="public/assets/diceRoll.gif" ng-show="showLoadingGIF" class="gif">
+			</div>
 		</div>
 
 
@@ -131,8 +142,22 @@
 
 
 
-		<!-- loading gif -->
-		<img ng-src="public/assets/diceRoll.gif" ng-show="showLoadingGIF" class="gif">
+
+		<!-- addition mode entry form -->
+		<div ng-show="showAdditionMode">
+			<div class="additionModeInputContainer">
+				<input type="text" ng-model="diceAdditionExpression"/>
+				<button ng-click="rollTheDice(diceAdditionExpression, '+')" class="buttonStyle">Add!</button>
+				<button ng-click="rollTheDice(diceAdditionExpression, '-')" class="buttonStyle">Subtract!</button>
+				<button ng-click="clear()" class="buttonStyle">Clear!</button>
+			</div>
+			<!-- result breakdown for addition mode -->
+			<div class="additionModeOutput" ng-show="showAdditionModeOutcome">
+				{{additionOutcome.runningOperation}} {{additionOutcome.runningOperation ? "=" : ""}}
+				{{additionOutcome.runningTotal}}
+			</div>
+		</div>
+
 
 
 
@@ -145,40 +170,6 @@
 		<!-- error message box -->
 		<div class="error" ng-show="showError">
 			<b>{{!showAdditionMode ? outcome.error : additionOutcome.error}}</b>
-		</div>
-
-
-
-
-
-
-
-
-
-		<!-- probability chart and result breakdown for normal mode -->
-		<div class="probabilityChartContainer" ng-show="showNormalOutcome && !showAdditionMode && !showLoadingGIF && outcome.odds">
-			<b class="middleOfChartText">ODDS</b>
-	  	<canvas id="doughnut" class="chart chart-doughnut"chart-data="data" chart-labels="labels"></canvas>
-	  </div>
-		<div class="outcome" ng-show="showNormalOutcome && !showAdditionMode && !showLoadingGIF">
-			From {{outcome.expressionEvaluated}}, we get the following outcome: {{outcome.result}} {{outcome.odds ? ("(~" + (outcome.odds[outcome.result]*100).toFixed(2) + "% chance)") : ""}}
-			<ul>
-				<li ng-repeat="step in outcome.stepByStepEvaluation track by $index"><img ng-src="public/assets/diceLogo.png" class="miniDiceImage"> {{step}}</li>
-			</ul>
-		</div>
-
-
-
-
-
-
-
-
-
-		<!-- result breakdown for addition mode -->
-		<div class="additionModeOutput" ng-show="showAdditionModeOutcome && showAdditionMode">
-			{{additionOutcome.runningOperation}} {{additionOutcome.runningOperation ? "=" : ""}}
-			{{additionOutcome.runningTotal}}
 		</div>
 
 

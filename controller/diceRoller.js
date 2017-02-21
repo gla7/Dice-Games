@@ -11,21 +11,13 @@ var polynomial = require('polynomial')
 
 
 // helper functions
-Array.prototype.min = function() {
-	return Math.min.apply(null, this)
-}
+Array.prototype.min = function() { return Math.min.apply(null, this) }
 
-Array.prototype.max = function() {
-	return Math.max.apply(null, this)
-}
+Array.prototype.max = function() { return Math.max.apply(null, this) }
 
-function decomposeExpression (expression) {
-	return expression.match(/[a-zA-Z]+|[0-9]+/g)
-}
+function decomposeExpression (expression) { return expression.match(/[a-zA-Z]+|[0-9]+/g) }
 
-function getRollOfAnXSidedDie (x) {
-	return Math.floor((Math.random() * x) + 1)
-}
+function getRollOfAnXSidedDie (x) { return Math.floor((Math.random() * x) + 1) }
 
 function getSumOfRolls (rolls) {
 	return rolls.reduce(function (runningTotal, resultOfRoll) {
@@ -41,7 +33,6 @@ function cloneArray (array) {
 
 function getStepByStepEvaluationOfNonExplosionExpression (expression, rolls, useCase, indecesOflowestOrHighestRolls) {
 	var expressionDecomposed = decomposeExpression(expression)
-	var numberOfDice = expressionDecomposed[0]
 	expressionDecomposed.splice(0, 1)
 	if (useCase === "simple") {
 		return rolls.map(function (roll) {
@@ -148,7 +139,7 @@ var showError = {
 
 
 // main API function
-function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
+function rollTheDiceByExpression (expression, isEstimatingProbabilities, isTest) {
 	var diceRollDetails = {
 		expressionEvaluated: expression,
 		error: null,
@@ -165,7 +156,7 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 		if (!isNaN(Number(expressionDecomposed[0]))) {
 			diceRollDetails.result = Number(expressionDecomposed[0])
 			diceRollDetails.stepByStepEvaluation = [expression + ": " + diceRollDetails.result]
-			diceRollDetails.odds = getExactOddsForExpression(expression, "literal")
+			diceRollDetails.odds = isTest ? null : getExactOddsForExpression(expression, "literal")
 			return diceRollDetails
 		}
 		diceRollDetails.error = showError.literalValueCaseCorrection
@@ -177,7 +168,7 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 		}
 		diceRollDetails.result = getRollOfAnXSidedDie(Number(expressionDecomposed[1]))
 		diceRollDetails.stepByStepEvaluation = [expression + ": " + diceRollDetails.result]
-		diceRollDetails.odds = getExactOddsForExpression(expression, "single die roll")
+		diceRollDetails.odds = isTest ? null : getExactOddsForExpression(expression, "single die roll")
 		return diceRollDetails
   } else {
 		var isInvalidExpression = false
@@ -200,7 +191,7 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
     if (expressionDecomposed.length === 3) {
     	diceRollDetails.result = getSumOfRolls(rolls)
     	diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfNonExplosionExpression(expression, rolls, "simple")
-    	diceRollDetails.odds = getExactOddsForExpression(expression, "multiple dice roll")
+    	diceRollDetails.odds = isTest ? null : getExactOddsForExpression(expression, "multiple dice roll")
     	return diceRollDetails
     } else if (expressionDecomposed.length === 5) {
     	var gamePlayed = expressionDecomposed[3]
@@ -220,7 +211,7 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
         }
         diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfNonExplosionExpression(expression, originalRolls, "drop", indecesOflowestRolls)
         diceRollDetails.result = getSumOfRolls(rolls)
-        diceRollDetails.odds = (!isGeneratingProbabilities && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
+        diceRollDetails.odds = (!isEstimatingProbabilities && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
         return diceRollDetails
 			} else if (gamePlayed === 'k') {
 				var resultsKept = Number(expressionDecomposed[4])
@@ -239,7 +230,7 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 				}
 				diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfNonExplosionExpression(expression, originalRolls, "keep", indecesOfHighestRolls)
 				diceRollDetails.result = getSumOfRolls(highestRolls)
-				diceRollDetails.odds = (!isGeneratingProbabilities && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
+				diceRollDetails.odds = (!isEstimatingProbabilities && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
 				return diceRollDetails
 			} else if (gamePlayed === 'x') {
 				var explosionThreshold = Number(expressionDecomposed[4])
@@ -250,9 +241,10 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 				var explosiveRolls = getExplosiveRollDetails(rolls, explosionThreshold, expressionDecomposed, facesInDice)
 				diceRollDetails.stepByStepEvaluation = explosiveRolls.stepByStepEvaluation
 				diceRollDetails.result = explosiveRolls.result
-				diceRollDetails.odds = (!isGeneratingProbabilities && numberOfDice <= 5 && (explosionThreshold/facesInDice) >= 0.5) ? getApproximateOddsForExpression(expression) : null
+				diceRollDetails.odds = (!isEstimatingProbabilities && numberOfDice <= 5 && (explosionThreshold/facesInDice) >= 0.5) ? getApproximateOddsForExpression(expression) : null
 				return diceRollDetails
 			} else {
+				diceRollDetails.error = showError.dKXCorrection
 				return diceRollDetails
 			}
     } else {
