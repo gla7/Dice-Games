@@ -81,16 +81,21 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 
 
 	// helper functions
+	// calls the non-probability-generating endpoint and parses the response, adjusting the state of the scope accordingly 
+	// (addition mode)
 	function handleAdditionModeSuccess (diceExpression, plusOrMinus) {
 		var runningOperation = $scope.additionOutcome.runningOperation
 		var runningTotal = $scope.additionOutcome.runningTotal
 		$http.get('/diceExpression/doNotGenerateProbabilities/' + diceExpression).then(function (response, error) {
 			$scope.additionOutcome = response.data.outcome
 			$scope.diceAdditionExpression = ''
+			// when there is an error message...
 			if ($scope.additionOutcome.error) {
 				$scope.showError = true
 				$scope.showAdditionModeOutcome = false
-			} else {
+			} 
+			// success handler
+			else {
 				$scope.additionOutcome.runningOperation = (runningOperation ? runningOperation : "") + " " + plusOrMinus + " (" + $scope.additionOutcome.stepByStepEvaluation.map(function (step) {
 					return step.includes("dropped") ? "(" + step.split(":")[0] + " dropped)" : step.split(":")[0]
 				}).join(" + ") + ")"
@@ -101,7 +106,8 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 			console.log($scope.additionOutcome)
 		})
 	}
-
+	// depending on whether the user checks the generate probability box, this function calls the corresponding endpoint and
+	// adjusts the state of the scope accordingly (normal mode)
 	function handleNormalModeSuccess (diceExpression) {
 		$scope.showError = false
 		$scope.showLoadingGIF = true
@@ -110,10 +116,13 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 			console.log("OUTCOME: ", response.data.outcome)
 			$scope.showLoadingGIF = false
 			$scope.outcome = response.data.outcome
+			// when there is an error message...
 			if ($scope.outcome.error) {
 				$scope.showError = true
 				$scope.showNormalOutcome = false
-			} else {
+			} 
+			// success handler
+			else {
 				$scope.showError = false
 				$scope.showNormalOutcome = true
 				$scope.labels = []
@@ -126,7 +135,7 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 			$scope.diceExpression = ''
 		})
 	}
-
+	// adjusts the state of the scope to the negatively frontend validated input when in addition mode
 	function handleAdditionModeError () {
 		$scope.additionOutcome.runningOperation = null
 		$scope.additionOutcome.runningTotal = null
@@ -135,7 +144,7 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 		$scope.showAdditionModeOutcome = false
 		$scope.diceAdditionExpression = ''
 	}
-
+	// adjusts the state of the scope to the negatively frontend validated input when in normal mode
 	function handleNormalModeError () {
 		$scope.outcome.error = "Please enter either non-negative integers or letters. No special characters! See examples above."
 		$scope.showError = true
@@ -153,14 +162,15 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 
 
 	// scope methods
+	// toggles between normal mode and addition mode
 	$scope.toggleAdditionMode = function () {
 		$scope.showAdditionMode = !$scope.showAdditionMode
 		$scope.additionModeButtonText = $scope.showAdditionMode ? "Click here to enable normal mode" : "Click here to enable addition mode"
 		$scope.showError = false
 	}
-
+	// toggles the instructions in and out of view
 	$scope.displayInstructions = function () { $scope.showInstructions = !$scope.showInstructions }
-
+	// this method is called when the user submits input either in normal mode or in addition mode
 	$scope.rollTheDice = function (diceExpression, plusOrMinus) {
 		var allowed = true
 		unallowedCharacters.map(function (character) {
@@ -182,7 +192,7 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 			}
 		}
 	}
-
+	// clears the output space as well as the error box from the addition mode space
 	$scope.clear = function () {
 		$scope.additionOutcome = {}
 		$scope.showError = false

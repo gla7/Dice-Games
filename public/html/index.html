@@ -75,7 +75,7 @@
 
 
 
-		<!-- instructions on how to use the app -->
+		<!-- instructions on how to use the app show if you click the display button -->
 		<button ng-click="displayInstructions()" class="displayInstructionsButton buttonStyle">{{showInstructions ? "Click here to hide instructions" : "Click here to read how to play"}}</button>
 		<div ng-show="showInstructions" class="instructions">
 			Welcome to "DEY SEE ME ROLLIN'...", a dice game simulator. The idea here is that you use the input boxes in normal mode or addition mode to tell us what you want to roll. You will do this with an expression that will follow certain guidelines. In normal mode for simple cases (literal value, single die roll, multiple dice roll), you will get the odds for each outcome of your particular input back. For more complex cases (drop lowest rolls, keep highest rolls, explosive rolls) you have the option to wait a little longer to get those odds calculated (for not-too-massive cases) if you use the checkbox below. Here are some basic rules:
@@ -138,7 +138,7 @@
 						</ul>
 					</div>
 				</div>
-				<!-- loading gif -->
+				<!-- loading gif for longer waits -->
 				<img ng-src="public/assets/diceRoll.gif" ng-show="showLoadingGIF" class="gif">
 			</div>
 		</div>
