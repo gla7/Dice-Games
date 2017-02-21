@@ -1,23 +1,85 @@
+// module and dependancy declaration
 var app = angular.module('app',["chart.js"])
 
+
+
+
+
+
+
+
+
+
+// controller and directives declaration
 app.controller('controller',['$scope', '$http', function ($scope, $http) {
 
-	console.log("front end controller loaded!!!")
 
+
+
+
+
+
+
+
+	//display scope variables
 	$scope.showInstructions = false
 	$scope.showError = false
-	$scope.showOutcome = false
-	$scope.additionMode = false
+	$scope.showNormalOutcome = false
+	$scope.showAdditionMode = false
 	$scope.showAdditionModeOutcome = false
+	$scope.showLoadingGIF = false
+
+
+
+
+
+
+
+
+
+	// parameter scope variables
 	$scope.generateProbabilities = false
 	$scope.additionModeButtonText = "Click here to enable addition mode"
 	$scope.outcome = {}
 	$scope.additionOutcome = {}
+	$scope.diceExpression = ''
+	$scope.diceAdditionExpression = ''
 
+
+
+
+
+
+
+
+	// scope variables for chart
+	$scope.labels = ["Initialized"]
+  $scope.data = [100]
+
+
+
+
+
+
+
+
+
+  // array of input characters that are not allowed
+	var unallowedCharacters = ['/', '.', '?', '#', '%', '\\']
+
+
+
+
+
+
+
+
+
+	// scope methods
 	$scope.toggleAdditionMode = function () {
-		$scope.additionMode = !$scope.additionMode
+		$scope.showAdditionMode = !$scope.showAdditionMode
 		$scope.showError = false
-		if ($scope.additionMode) {
+		if ($scope.showAdditionMode) {
 			$scope.additionModeButtonText = "Click here to enable normal mode"
 		} else {
 			$scope.additionModeButtonText = "Click here to enable addition mode"
@@ -27,10 +89,6 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 	$scope.displayInstructions = function () {
 		$scope.showInstructions = !$scope.showInstructions
 	}
-
-	$scope.diceExpression = ''
-	$scope.diceAdditionExpression = ''
-	var unallowedCharacters = ['/', '.', '?', '#', '%', '\\']
 
 	$scope.submitButton = function (diceExpression) {
 		console.log(diceExpression, typeof diceExpression)
@@ -42,19 +100,19 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 		})
 		if (allowed && diceExpression !== '') {
 			$scope.showError = false
-			$scope.showGIF = true
+			$scope.showLoadingGIF = true
 			console.log("THE CHECKBOX IS: ", $scope.generateProbabilities)
 			var generatedProbabilitiesString = $scope.generateProbabilities ? "generateProbabilities" : "doNotGenerateProbabilities"
 			$http.get('/diceExpression/' + generatedProbabilitiesString + '/' + diceExpression).then(function (response, error) {
 				console.log("OUTCOME: ", response.data.outcome)
-				$scope.showGIF = false
+				$scope.showLoadingGIF = false
 				$scope.outcome = response.data.outcome
 				if ($scope.outcome.error) {
 					$scope.showError = true
-					$scope.showOutcome = false
+					$scope.showNormalOutcome = false
 				} else {
 					$scope.showError = false
-					$scope.showOutcome = true
+					$scope.showNormalOutcome = true
 					//testing
 					$scope.labels = []
   				$scope.data = []
@@ -69,7 +127,7 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 		} else {
 			$scope.outcome.error = "Please enter either non-negative integers or letters. No special characters! See examples above."
 			$scope.showError = true
-			$scope.showOutcome = false
+			$scope.showNormalOutcome = false
 			$scope.diceExpression = ''
 		}
 	}
@@ -136,8 +194,5 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 		$scope.additionOutcome = {}
 		$scope.showError = false
 	}
-
- 	$scope.labels = ["Initialized"]
-  $scope.data = [100]
 
 }])

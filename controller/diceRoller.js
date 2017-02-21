@@ -39,90 +39,103 @@ function cloneArray (array) {
 	})
 }
 
-function getStepByStepEvaluationOfExpression (expression, rolls, useCase, indecesOflowestOrHighestRolls) {
+function getStepByStepEvaluationOfNonExplosionExpression (expression, rolls, useCase, indecesOflowestOrHighestRolls) {
 	var expressionDecomposed = decomposeExpression(expression)
-	// var allSteps = ""
 	var numberOfDice = expressionDecomposed[0]
 	expressionDecomposed.splice(0, 1)
 	if (useCase === "simple") {
-		//testing
 		return rolls.map(function (roll) {
 			return 1 + expressionDecomposed.join("") + ": " + roll
 		})
-		//testing
-		// for (var i = 0; i < numberOfDice; i++) {
-		// 	allSteps = allSteps + " 1" + expressionDecomposed.join("")
-		// }
-		// allSteps = allSteps.trim().split(" ")
-	 //  return allSteps.map(function (step, stepIndex) {
-	 //  	return step + ": " + rolls[stepIndex]
-	 //  })
 	} else if (useCase === "drop") {
 		expressionDecomposed.pop()
 		expressionDecomposed.pop()
-		//testing
 		return rolls.map(function (roll, rollIndex) {
 			return indecesOflowestOrHighestRolls.includes(rollIndex) ? (1 + expressionDecomposed.join("")) + ": " + roll + " => dropped" : (1 + expressionDecomposed.join("")) + ": " + roll + " => kept"
 		})
-		//testing
-		// for (var i = 0; i < numberOfDice; i++) {
-		// 	allSteps = allSteps + " 1" + expressionDecomposed.join("")
-		// }
-		// allSteps = allSteps.trim().split(" ")
-	 //  return allSteps.map(function (step, stepIndex) {
-	 //  	return indecesOflowestOrHighestRolls.includes(stepIndex) ? step + ": " + rolls[stepIndex] + " => dropped" : step + ": " + rolls[stepIndex] + " => kept"
-	 //  })
 	} else if (useCase === "keep") {
 		expressionDecomposed.pop()
 		expressionDecomposed.pop()
-		//testing
 		return rolls.map(function (roll, rollIndex) {
 			return indecesOflowestOrHighestRolls.includes(rollIndex) ? (1 + expressionDecomposed.join("")) + ": " + roll + " => kept" : (1 + expressionDecomposed.join("")) + ": " + roll + " => dropped"
 		})
-		//testing
-		// for (var i = 0; i < numberOfDice; i++) {
-		// 	allSteps = allSteps + " 1" + expressionDecomposed.join("")
-		// }
-		// allSteps = allSteps.trim().split(" ")
-	 //  return allSteps.map(function (step, stepIndex) {
-	 //  	return indecesOflowestOrHighestRolls.includes(stepIndex) ? step + ": " + rolls[stepIndex] + " => kept" : step + ": " + rolls[stepIndex] + " => dropped"
-	 //  })
 	} 
 }
 
-function getExplosiveRolls (rolls, explosionThreshold, expressionDecomposed, facesInDice) {
-	var runningSum = 0
-	var steps = []
+function getExplosiveRollDetails (rolls, explosionThreshold, expressionDecomposed, facesInDice) {
+	var result = 0
+	var stepByStepEvaluation = []
 	function explode (array, index, threshold, expressionDecomposed, facesInDice) {
 		if (!array[index]) {
 			return {
-				runningSum: runningSum,
-				steps: steps,
+				result: result,
+				stepByStepEvaluation: stepByStepEvaluation,
 			}
 		}
 		if (array[index] >= threshold) {
-			runningSum = runningSum + array[index]
-			steps.push(1 + expressionDecomposed[1] + expressionDecomposed[2] + ": " + array[index])
+			result = result + array[index]
+			stepByStepEvaluation.push(1 + expressionDecomposed[1] + expressionDecomposed[2] + ": " + array[index])
 			array[index] = getRollOfAnXSidedDie(facesInDice)
 			return explode(array, index, threshold, expressionDecomposed, facesInDice)
 		}
-		runningSum = runningSum + array[index]
-		steps.push(1 + expressionDecomposed[1] + expressionDecomposed[2] + ": " + array[index])
+		result = result + array[index]
+		stepByStepEvaluation.push(1 + expressionDecomposed[1] + expressionDecomposed[2] + ": " + array[index])
 		return explode(array, index + 1, threshold, expressionDecomposed, facesInDice)
 	}
 	return explode(rolls, 0, explosionThreshold, expressionDecomposed, facesInDice)
 }
 
+function getExactOddsForExpression (expression, useCase) {
+	var probabilities = {}
+	var expressionDecomposed = decomposeExpression(expression)
+	if (useCase === "literal") {
+		var literalNumber = Number(expressionDecomposed[0])
+		probabilities[literalNumber] = 1
+		return probabilities
+	} else if (useCase === "single die roll") {
+		var facesInDice = Number(expressionDecomposed[1])
+		for (var i = 0; i < facesInDice; i++) {
+			probabilities[i + 1] = 1/facesInDice
+		}
+		return probabilities
+	} else if (useCase === "multiple dice roll") {
+		var numberOfDice = Number(expressionDecomposed[0])
+		var facesInDice = Number(expressionDecomposed[2])
+		var polynomialString = ""
+  	for (var i = 0; i < facesInDice; i++) {
+  		polynomialString = polynomialString === "" ? polynomialString + "x^" + (i + 1) : polynomialString + "+x^" + (i + 1)
+  	}
+  	var polynomialCoefficients = polynomial(polynomialString).pow(numberOfDice).coeff
+  	for (coefficient in polynomialCoefficients) {
+  		probabilities[coefficient] = polynomialCoefficients[coefficient]/Math.pow(Number(facesInDice), numberOfDice)
+  	}
+  	return probabilities
+	}
+}
+
 function getApproximateOddsForExpression (expression) {
 	var probabilities = {}
-	for (var i = 0; i < 25001; i++) {
+	var sampleSize = 25000
+	for (var i = 0; i < sampleSize; i++) {
 		if (probabilities[rollTheDiceByExpression(expression, true).result]) {
-			probabilities[rollTheDiceByExpression(expression, true).result] = probabilities[rollTheDiceByExpression(expression, true).result] + 1/25000
+			probabilities[rollTheDiceByExpression(expression, true).result] = probabilities[rollTheDiceByExpression(expression, true).result] + 1/sampleSize
 		} else {
-			probabilities[rollTheDiceByExpression(expression, true).result] = 1/25000
+			probabilities[rollTheDiceByExpression(expression, true).result] = 1/sampleSize
 		}
 	}
 	return probabilities
+}
+
+var showError = {
+	noSpecialCharacters: "Please enter either non-negative integers or letters. No special characters! See examples above.",
+	literalValueCaseCorrection: "For a literal value case, please enter a non-negative integer. See examples above.",
+	singleDieRollCorrection: "For a single die roll with N (N should be positive) faces, please follow this example: single roll of a 6-sided die = 'd6'. More examples above.",
+	multipleDiceRollCorrection: "For multiple dice, the expression should always begin with a positive integer followed by a 'd' followed by another positive integer. For example, the expression for 3 6-sided dice would be '3d6'. More examples above.",
+	dropCorrection: "Cannot drop as many or more results than there are available! See explanations above.",
+	keepCorrection: "Cannot keep zero results or more results than there are available! See explanations above.",
+	explosionCorrection: "Cannot have an explosion threshold at or below 1. This would result in an infinite operation! See explanations above.",
+	dKXCorrection: "To play drop, keep, or explode, please use 'd', 'k' or 'x' respectively. See examples above.",
+	tooMuchInput: "Something is wrong with your input (e.g. too much of it: '4d5d6d1'). See examples above.",
 }
 
 
@@ -145,30 +158,26 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 	}
 	var expressionDecomposed = decomposeExpression(expression)
 	if (!expressionDecomposed || expression.length !== expressionDecomposed.join("").length) {
-		diceRollDetails.error = "Please enter either non-negative integers or letters. No special characters! See examples above."
+		diceRollDetails.error = showError.noSpecialCharacters
 		return diceRollDetails
 	}
 	if (expressionDecomposed.length === 1) {
 		if (!isNaN(Number(expressionDecomposed[0]))) {
 			diceRollDetails.result = Number(expressionDecomposed[0])
 			diceRollDetails.stepByStepEvaluation = [expression + ": " + diceRollDetails.result]
-			diceRollDetails.odds = {}
-			diceRollDetails.odds[diceRollDetails.result] = 1
+			diceRollDetails.odds = getExactOddsForExpression(expression, "literal")
 			return diceRollDetails
 		}
-		diceRollDetails.error = "For a literal value case, please enter a non-negative integer. See examples above."
+		diceRollDetails.error = showError.literalValueCaseCorrection
 		return diceRollDetails
 	} else if (expressionDecomposed.length === 2) {
 		if (Number(expressionDecomposed[1]) === 0 || expressionDecomposed[0] !== 'd') {
-			diceRollDetails.error = "For a single die roll with N (N should be positive) faces, please follow this example: single roll of a 6-sided die = 'd6'. More examples above."
+			diceRollDetails.error = showError.singleDieRollCorrection
 			return diceRollDetails
 		}
 		diceRollDetails.result = getRollOfAnXSidedDie(Number(expressionDecomposed[1]))
 		diceRollDetails.stepByStepEvaluation = [expression + ": " + diceRollDetails.result]
-		diceRollDetails.odds = {}
-		for (var i = 0; i < Number(expressionDecomposed[1]); i++) {
-			diceRollDetails.odds[i+1] = 1/Number(expressionDecomposed[1])
-		}
+		diceRollDetails.odds = getExactOddsForExpression(expression, "single die roll")
 		return diceRollDetails
   } else {
 		var isInvalidExpression = false
@@ -181,7 +190,7 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 			}
 		})
 		if (isInvalidExpression || numberOfDice === 0 || facesInDice === 0 || characterPreceedingFacesInDice !== 'd') {
-			diceRollDetails.error = "For multiple dice, the expression should always begin with a positive integer followed by a 'd' followed by another positive integer. For example, the expression for 3 6-sided dice would be '3d6'. More examples above."
+			diceRollDetails.error = showError.multipleDiceRollCorrection
 			return diceRollDetails
 		}		
 		var rolls = []
@@ -190,23 +199,15 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 		}
     if (expressionDecomposed.length === 3) {
     	diceRollDetails.result = getSumOfRolls(rolls)
-    	diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfExpression(expression, rolls, "simple")
-    	diceRollDetails.odds = {}
-    	var polynomialString = ""
-    	for (var i = 0; i < facesInDice; i++) {
-    		polynomialString = polynomialString === "" ? polynomialString + "x^" + (i + 1) : polynomialString + "+x^" + (i + 1)
-    	}
-    	var polynomialCoefficients = polynomial(polynomialString).pow(numberOfDice).coeff
-    	for (coefficient in polynomialCoefficients) {
-    		diceRollDetails.odds[coefficient] = polynomialCoefficients[coefficient]/Math.pow(facesInDice, numberOfDice)
-    	}
+    	diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfNonExplosionExpression(expression, rolls, "simple")
+    	diceRollDetails.odds = getExactOddsForExpression(expression, "multiple dice roll")
     	return diceRollDetails
     } else if (expressionDecomposed.length === 5) {
     	var gamePlayed = expressionDecomposed[3]
 			if (gamePlayed === 'd') {
 				var resultsDropped = Number(expressionDecomposed[4])
 				if (resultsDropped >= numberOfDice) {
-					diceRollDetails.error = "Cannot drop as many or more results than there are available! See explanations above."
+					diceRollDetails.error = showError.dropCorrection
 					return diceRollDetails
 				}
 				var indecesOflowestRolls = []
@@ -217,14 +218,14 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 					rollsCopyForOrdering[rollsCopyForOrdering.indexOf(rollsCopyForOrdering.min())] = 999999999999999
 					rolls.splice(rolls.indexOf(rolls.min()),1)
         }
-        diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfExpression(expression, originalRolls, "drop", indecesOflowestRolls)
+        diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfNonExplosionExpression(expression, originalRolls, "drop", indecesOflowestRolls)
         diceRollDetails.result = getSumOfRolls(rolls)
         diceRollDetails.odds = (!isGeneratingProbabilities && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
         return diceRollDetails
 			} else if (gamePlayed === 'k') {
 				var resultsKept = Number(expressionDecomposed[4])
 				if (resultsKept === 0 || resultsKept > numberOfDice) {
-					diceRollDetails.error = "Cannot keep zero results or more results than there are available! See explanations above."
+					diceRollDetails.error = showError.keepCorrection
 					return diceRollDetails
 				}
 				var highestRolls = []
@@ -236,27 +237,26 @@ function rollTheDiceByExpression (expression, isGeneratingProbabilities) {
 					rollsCopyForOrdering[rollsCopyForOrdering.indexOf(rollsCopyForOrdering.max())] = -999999999999999
 					highestRolls.push(rolls.splice(rolls.indexOf(rolls.max()),1)[0])
 				}
-				diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfExpression(expression, originalRolls, "keep", indecesOfHighestRolls)
+				diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfNonExplosionExpression(expression, originalRolls, "keep", indecesOfHighestRolls)
 				diceRollDetails.result = getSumOfRolls(highestRolls)
 				diceRollDetails.odds = (!isGeneratingProbabilities && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
 				return diceRollDetails
 			} else if (gamePlayed === 'x') {
 				var explosionThreshold = Number(expressionDecomposed[4])
 				if (explosionThreshold <= 1) {
-					diceRollDetails.error = "Cannot have an explosion threshold at or below 1. This would result in an infinite operation! See explanations above."
+					diceRollDetails.error = showError.explosionCorrection
 					return diceRollDetails
 				}
-				var explosiveRolls = getExplosiveRolls(rolls, explosionThreshold, expressionDecomposed, facesInDice)
-				diceRollDetails.stepByStepEvaluation = explosiveRolls.steps
-				diceRollDetails.result = explosiveRolls.runningSum
+				var explosiveRolls = getExplosiveRollDetails(rolls, explosionThreshold, expressionDecomposed, facesInDice)
+				diceRollDetails.stepByStepEvaluation = explosiveRolls.stepByStepEvaluation
+				diceRollDetails.result = explosiveRolls.result
 				diceRollDetails.odds = (!isGeneratingProbabilities && numberOfDice <= 5 && (explosionThreshold/facesInDice) >= 0.5) ? getApproximateOddsForExpression(expression) : null
 				return diceRollDetails
 			} else {
-				diceRollDetails.error = "To play drop, keep, or explode, please use 'd', 'k' or 'x' respectively. See examples above."
 				return diceRollDetails
 			}
     } else {
-    	diceRollDetails.error = "Something is wrong with your input (e.g. too much of it: '4d5d6d1'). See examples above."
+			diceRollDetails.error = showError.tooMuchInput
 			return diceRollDetails
     }
   }
