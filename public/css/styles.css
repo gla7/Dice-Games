@@ -58,6 +58,7 @@ button:focus {outline:0;}
 	margin-bottom: 50px;
 	margin: auto;
 	width: 75%;
+	text-align: start;
 }
 
 .additionModeTogglerContainer {
