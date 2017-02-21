@@ -13,7 +13,7 @@ var endpointHandlers = require('./controller/endpointHandlers.js')
 
 
 
-// express instantiation
+// express instantiation and basic settings
 var app = express()
 
 app.use(cors())
@@ -30,12 +30,13 @@ app.use(express.static(__dirname))
 
 
 // endpoints
-app.get("/", endpointHandlers.homePage)
-
-app.get("/diceExpression/generateProbabilities/:diceExpression", endpointHandlers.diceExpressionWithProbabilities)
-
+app.get("/", endpointHandlers.homePage) // loads homepage
+// simulates dice roll as per expression, breakdown, (or error message if applicable) and generates probabilities
+app.get("/diceExpression/generateProbabilities/:diceExpression", endpointHandlers.diceExpressionWithProbabilities) 
+// simulates dice roll as per expression, breakdown, (or error message if applicable) and generates probabilities 
+// for basic cases only
 app.get("/diceExpression/doNotGenerateProbabilities/:diceExpression", endpointHandlers.diceExpressionNoProbabilities)
-
+// simulates dice roll as per expression and breakdown (or error message if applicable) (testing purposes)
 app.get("/diceExpression/testEndpoint/:diceExpression", endpointHandlers.diceExpressionTestEndpoint)
 
 

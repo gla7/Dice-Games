@@ -1,5 +1,7 @@
 // requires
-var polynomial = require('polynomial')
+// this library makes calculating the odds for multiple dice roll slightly easier by 
+// providing polynomial coefficients after polynomial operations
+var polynomial = require('polynomial') 
 
 
 
@@ -14,7 +16,7 @@ var polynomial = require('polynomial')
 Array.prototype.min = function() { return Math.min.apply(null, this) }
 
 Array.prototype.max = function() { return Math.max.apply(null, this) }
-
+// separates batches of letters from batches of numbers- important to break down input expressions
 function decomposeExpression (expression) { return expression.match(/[a-zA-Z]+|[0-9]+/g) }
 
 function getRollOfAnXSidedDie (x) { return Math.floor((Math.random() * x) + 1) }
@@ -30,7 +32,8 @@ function cloneArray (array) {
 		return item
 	})
 }
-
+// obtains breakdown of expression for multiple dice roll, drop lowest, and keep highest cases e.g. 
+// 3d6 => 1d6: 3, 1d6: 1, 1d6: 5 (as an array of strings)
 function getStepByStepEvaluationOfNonExplosionExpression (expression, rolls, useCase, indecesOflowestOrHighestRolls) {
 	var expressionDecomposed = decomposeExpression(expression)
 	expressionDecomposed.splice(0, 1)
@@ -52,7 +55,7 @@ function getStepByStepEvaluationOfNonExplosionExpression (expression, rolls, use
 		})
 	} 
 }
-
+// uses recursiveness to repeat or progress explosive rolls and keep track of the breakdown and running sum
 function getExplosiveRollDetails (rolls, explosionThreshold, expressionDecomposed, facesInDice) {
 	var result = 0
 	var stepByStepEvaluation = []
@@ -75,7 +78,9 @@ function getExplosiveRollDetails (rolls, explosionThreshold, expressionDecompose
 	}
 	return explode(rolls, 0, explosionThreshold, expressionDecomposed, facesInDice)
 }
-
+// calculates the exact odds for literal, single die roll, and multiple dice rolls. To calculate multiple dice rolls, I've used
+// the moment generating function of the distribution of the dice. The full reasoning is expressed here:
+// http://digitalscholarship.unlv.edu/cgi/viewcontent.cgi?article=1025&context=grrj
 function getExactOddsForExpression (expression, useCase) {
 	var probabilities = {}
 	var expressionDecomposed = decomposeExpression(expression)
@@ -103,7 +108,10 @@ function getExactOddsForExpression (expression, useCase) {
   	return probabilities
 	}
 }
-
+// calculates the approximate odds for the more complex cases (drop lowest, keep highest, exploding rolls) provided 
+// the input numbers in the expression are not large, and the way I achieve this is by simulating a reasonably large 
+// sample of results for the same expression while keeping running time tolerable. I want to give exact probabilities
+// for these expressions, and as soon as I find a way calculate them analytically I will.
 function getApproximateOddsForExpression (expression) {
 	var probabilities = {}
 	var sampleSize = 25000
@@ -116,7 +124,7 @@ function getApproximateOddsForExpression (expression) {
 	}
 	return probabilities
 }
-
+// holds the exact error string for each error case
 var showError = {
 	noSpecialCharacters: "Please enter either non-negative integers or letters. No special characters! See examples above.",
 	literalValueCaseCorrection: "For a literal value case, please enter a non-negative integer. See examples above.",
@@ -141,6 +149,7 @@ var showError = {
 
 // main API function
 function rollTheDiceByExpression (expression, isEstimatingProbabilities, isTest) {
+	// this is the object that will be returned to the user
 	var diceRollDetails = {
 		expressionEvaluated: expression,
 		error: null,
@@ -148,11 +157,14 @@ function rollTheDiceByExpression (expression, isEstimatingProbabilities, isTest)
 		stepByStepEvaluation: null,
 		odds: null,
 	}
+	// here we break down the expression
 	var expressionDecomposed = decomposeExpression(expression)
+	// special character error handling
 	if (!expressionDecomposed || expression.length !== expressionDecomposed.join("").length) {
 		diceRollDetails.error = showError.noSpecialCharacters
 		return diceRollDetails
 	}
+	// literal case handling
 	if (expressionDecomposed.length === 1) {
 		if (!isNaN(Number(expressionDecomposed[0]))) {
 			diceRollDetails.result = Number(expressionDecomposed[0])
@@ -160,13 +172,19 @@ function rollTheDiceByExpression (expression, isEstimatingProbabilities, isTest)
 			diceRollDetails.odds = isTest ? null : getExactOddsForExpression(expression, "literal")
 			return diceRollDetails
 		}
+		// literal case error handling
 		diceRollDetails.error = showError.literalValueCaseCorrection
 		return diceRollDetails
-	} else if (expressionDecomposed.length === 2) {
+	} 
+	// single die roll case handling
+	else if (expressionDecomposed.length === 2) {
+		// single die roll error handling
 		if (Number(expressionDecomposed[1]) === 0 || expressionDecomposed[0] !== 'd') {
 			diceRollDetails.error = showError.singleDieRollCorrection
 			return diceRollDetails
-		} else if (Number(expressionDecomposed[1]) > 100000) {
+		}
+		// large number error handling 
+		else if (Number(expressionDecomposed[1]) > 100000) {
 			diceRollDetails.error = showError.tooLargeANumber
 			return diceRollDetails
 		}
@@ -174,40 +192,55 @@ function rollTheDiceByExpression (expression, isEstimatingProbabilities, isTest)
 		diceRollDetails.stepByStepEvaluation = [expression + ": " + diceRollDetails.result]
 		diceRollDetails.odds = isTest ? null : getExactOddsForExpression(expression, "single die roll")
 		return diceRollDetails
-  } else {
+  }
+  // multiple dice rolls, drop lowest rolls, keep highest rolls, and explosive rolls handling 
+  else {
 		var isInvalidExpression = false
 		var numberOfDice = Number(expressionDecomposed[0])
 		var facesInDice = Number(expressionDecomposed[2])
 		var characterPreceedingFacesInDice = expressionDecomposed[1]
+		// checking validity of expression
 		expressionDecomposed.map(function (expressionComponent, index) {
 			if ((index % 2 === 0 && isNaN(Number(expressionComponent))) || (index % 2 !== 0 && !isNaN(Number(expressionComponent)))) {
 				isInvalidExpression = true
 			}
 		})
+		// multiple roll general error handling
 		if (isInvalidExpression || numberOfDice === 0 || facesInDice === 0 || characterPreceedingFacesInDice !== 'd') {
 			diceRollDetails.error = showError.multipleDiceRollCorrection
 			return diceRollDetails
-		} else if (Number(expressionDecomposed[0]) > 100000 || Number(expressionDecomposed[2]) > 100000) {
+		} 
+		// large number error handling
+		else if (Number(expressionDecomposed[0]) > 100000 || Number(expressionDecomposed[2]) > 100000) {
 			diceRollDetails.error = showError.tooLargeANumber
 			return diceRollDetails
 		}	
+		// generate rolls
 		var rolls = []
 		for (var i = 0; i < numberOfDice; i++) {
 			rolls.push(getRollOfAnXSidedDie(facesInDice))
 		}
+		// multiple dice rolls handling
     if (expressionDecomposed.length === 3) {
     	diceRollDetails.result = getSumOfRolls(rolls)
     	diceRollDetails.stepByStepEvaluation = getStepByStepEvaluationOfNonExplosionExpression(expression, rolls, "simple")
     	diceRollDetails.odds = isTest ? null : getExactOddsForExpression(expression, "multiple dice roll")
     	return diceRollDetails
-    } else if (expressionDecomposed.length === 5) {
+    }
+    // drop lowest rolls, keep highest rolls, and explosive rolls handling 
+    else if (expressionDecomposed.length === 5) {
     	var gamePlayed = expressionDecomposed[3]
+    	// drop lowest rolls handling
 			if (gamePlayed === 'd') {
 				var resultsDropped = Number(expressionDecomposed[4])
+				// keep highest rolls error handling
 				if (resultsDropped >= numberOfDice) {
 					diceRollDetails.error = showError.dropCorrection
 					return diceRollDetails
 				}
+				// we make two copies of the rolls; one for remembering the original order, another to
+				// keep track of the surviving rolls. This is done to present the dropped and kept rolls
+				// in order
 				var indecesOflowestRolls = []
 				var originalRolls = cloneArray(rolls)
 				var rollsCopyForOrdering = cloneArray(rolls)
@@ -220,12 +253,18 @@ function rollTheDiceByExpression (expression, isEstimatingProbabilities, isTest)
         diceRollDetails.result = getSumOfRolls(rolls)
         diceRollDetails.odds = (!isEstimatingProbabilities && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
         return diceRollDetails
-			} else if (gamePlayed === 'k') {
+			} 
+			// keep highest rolls handling
+			else if (gamePlayed === 'k') {
 				var resultsKept = Number(expressionDecomposed[4])
+				// keep highest rolls error handling
 				if (resultsKept === 0 || resultsKept > numberOfDice) {
 					diceRollDetails.error = showError.keepCorrection
 					return diceRollDetails
 				}
+				// we make two copies of the rolls; one for remembering the original order, another to
+				// keep track of the surviving rolls. This is done to present the dropped and kept rolls
+				// in order
 				var highestRolls = []
 				var indecesOfHighestRolls = []
 				var originalRolls = cloneArray(rolls)
@@ -239,8 +278,11 @@ function rollTheDiceByExpression (expression, isEstimatingProbabilities, isTest)
 				diceRollDetails.result = getSumOfRolls(highestRolls)
 				diceRollDetails.odds = (!isEstimatingProbabilities && numberOfDice <= 15) ? getApproximateOddsForExpression(expression) : null
 				return diceRollDetails
-			} else if (gamePlayed === 'x') {
+			} 
+			// explosive rolls handling
+			else if (gamePlayed === 'x') {
 				var explosionThreshold = Number(expressionDecomposed[4])
+				// explosive rolls error handling
 				if (explosionThreshold <= 1 || explosionThreshold > facesInDice) {
 					diceRollDetails.error = showError.explosionCorrection
 					return diceRollDetails
@@ -250,11 +292,15 @@ function rollTheDiceByExpression (expression, isEstimatingProbabilities, isTest)
 				diceRollDetails.result = explosiveRolls.result
 				diceRollDetails.odds = (!isEstimatingProbabilities && numberOfDice <= 5 && (explosionThreshold/facesInDice) >= 0.5) ? getApproximateOddsForExpression(expression) : null
 				return diceRollDetails
-			} else {
+			} 
+			// user entering neither of d k or x error handling
+			else {
 				diceRollDetails.error = showError.dKXCorrection
 				return diceRollDetails
 			}
-    } else {
+    } 
+    // too much input error handling
+    else {
 			diceRollDetails.error = showError.tooMuchInput
 			return diceRollDetails
     }
