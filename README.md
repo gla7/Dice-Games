@@ -21,4 +21,4 @@ For testing, we use Mocha and Chai. By running the command
 
 ``` mocha ```
 
-the main dice simulation functionality is tested.
+the main dice simulation functionality is tested. Note that the server must not be running if you are going to perform unit tests!
