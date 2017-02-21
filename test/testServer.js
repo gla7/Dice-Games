@@ -3,11 +3,29 @@ var chai = require('chai')
 var chaiHttp = require('chai-http')
 var server = require('../server.js')
 
+
+
+
+
+
+
+
+
+
 // needed by mocha/chai
 var should = chai.should()
 var expect = chai.expect
 var app = server.app
 chai.use(chaiHttp)
+
+
+
+
+
+
+
+
+
 
 // helper functions
 function randomNumberBetweenMAndN (m, n) { return Math.floor(Math.random()*(n - m + 1) + m) }
@@ -19,17 +37,44 @@ function generateRandomLetterString (length, charactersAvailable) {
   return text.trim()
 }
 
+
+
+
+
+
+
+
+
+
 // test parameters
 var numberOfTestsInEachCase = 10
 var limitOfLiteralValueCase = 100
 var limitOfFacesInDice = 100
 var limitOfNumberOfDice = 100
 
+
+
+
+
+
+
+
+
+
 // test generator helpers
 var notPermittedSymbols = "`~!@$^&*()-_=+[{]}|;:',<>".split("")
 var invalidLetters = "abcefghijlmnopqrstuvwyzQWERTYUIOPASFFGHJLZCVBNM"
 var numbers = "0123456789"
 var kdx = "kdx"
+
+
+
+
+
+
+
+
+
 
 // tests start here
 describe("HOMEPAGE LOAD", function () {
