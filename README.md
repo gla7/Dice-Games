@@ -13,7 +13,7 @@ After you do that, run either of the two following commands:
 
 or
 
-nodemon server.js
+```nodemon server.js```
 
 # Testing the API
 
