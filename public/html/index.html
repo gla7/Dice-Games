@@ -1,26 +1,8 @@
 <!-- doctype declaration -->
 <!doctype html>
 
-
-
-
-
-
-
-
-
-
 <!-- begin html document and tie angular module to it-->
 <html lang="en" ng-app="app">
-
-
-
-
-
-
-
-
-
 
 	<!-- begin head -->
 	<head>
@@ -39,41 +21,14 @@
 	  <script src="public/js/app.js"></script>
 	</head>
 
-
-
-
-
-
-
-
-
-
 	<!-- begin body and tie angular controller to it -->
 	<body ng-controller="controller">
-
-
-
-
-
-
-
-
-
 
 		<!-- cover image and title -->
 		<div class="coverContainer">
 			<img ng-src="public/assets/dice.png" class="coverImage"/>
 			<b class="coverTitle">DEY SEE ME ROLLIN'...</b>
 		</div>
-
-
-
-
-
-
-
-
-
 
 		<!-- instructions on how to use the app show if you click the display button -->
 		<button ng-click="displayInstructions()" class="displayInstructionsButton buttonStyle">{{showInstructions ? "Click here to hide instructions" : "Click here to read how to play"}}</button>
@@ -90,28 +45,10 @@
 			The game has two modes: normal and addition modes. Normal mode is largely described by the first paragraph and each type of input above. In addition mode, we do not see the odds of each expression, but rather we see a breakdown of each expression, and its outcome that can be added or subtracted to subsequent expressions. The best way to learn how to play is to begin playing! <br/><br/><br/>
 		</div>
 
-
-
-
-
-
-
-
-
-
 		<!-- button that controls toggle between addition mode and normal mode -->
 		<div class="additionModeTogglerContainer">
 			<button ng-click="toggleAdditionMode()" class="buttonStyle">{{additionModeButtonText}}</button>
 		</div>
-
-
-
-
-
-
-
-
-
 
 		<!-- normal mode expression entry form and optional probability calculator for d, k and x -->
 		<div ng-show="!showAdditionMode">
@@ -143,15 +80,6 @@
 			</div>
 		</div>
 
-
-
-
-
-
-
-
-
-
 		<!-- addition mode entry form -->
 		<div ng-show="showAdditionMode">
 			<div class="additionModeInputContainer">
@@ -167,38 +95,9 @@
 			</div>
 		</div>
 
-
-
-
-
-
-
-
-
-
 		<!-- error message box -->
 		<div class="error" ng-show="showError">
 			<b>{{!showAdditionMode ? outcome.error : additionOutcome.error}}</b>
 		</div>
-
-
-
-
-
-
-
-
-
-
 	</body>
-
-
-
-
-
-
-
-
-
-
 </html>
