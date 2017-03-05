@@ -1,26 +1,8 @@
 // module and dependancy declaration
 var app = angular.module('app',["chart.js"])
 
-
-
-
-
-
-
-
-
-
 // controller and directives declaration
 app.controller('controller',['$scope', '$http', function ($scope, $http) {
-
-
-
-
-
-
-
-
-
 
 	//display controlling scope variables
 	$scope.showInstructions = false
@@ -30,15 +12,6 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 	$scope.showAdditionModeOutcome = false
 	$scope.showLoadingGIF = false
 
-
-
-
-
-
-
-
-
-
 	// parameter scope variables
 	$scope.generateProbabilities = false
 	$scope.additionModeButtonText = "Click here to enable addition mode"
@@ -47,38 +20,12 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 	$scope.diceExpression = ''
 	$scope.diceAdditionExpression = ''
 
-
-
-
-
-
-
-
-
-
 	// scope variables for chart
 	$scope.labels = ["Initialized"]
   $scope.data = [100]
 
-
-
-
-
-
-
-
-
-
   // array of input characters that are not allowed
 	var unallowedCharacters = ['/', '.', '?', '#', '%', '\\']
-
-
-
-
-
-
-
-
 
 	// helper functions
 	// calls the non-probability-generating endpoint and parses the response, adjusting the state of the scope accordingly 
@@ -152,15 +99,6 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 		$scope.diceExpression = ''
 	}
 
-
-
-
-
-
-
-
-
-
 	// scope methods
 	// toggles between normal mode and addition mode
 	$scope.toggleAdditionMode = function () {
@@ -178,18 +116,17 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 				allowed = false
 			}
 		})
-		if (allowed && diceExpression !== '') {
-			if (plusOrMinus) {
-				handleAdditionModeSuccess(diceExpression, plusOrMinus)
-			} else {
-				handleNormalModeSuccess(diceExpression)
-			}
+		var isAdditionModeSuccess = allowed && diceExpression !== '' && plusOrMinus
+		var isAdditionModeError = plusOrMinus && (!allowed || diceExpression === '')
+		var isNormalModeSuccess = allowed && diceExpression && !plusOrMinus
+		if (isAdditionModeSuccess) {
+			handleAdditionModeSuccess(diceExpression, plusOrMinus)
+		} else if (isAdditionModeError) {
+			handleAdditionModeError()
+		} else if (isNormalModeSuccess) {
+			handleNormalModeSuccess(diceExpression)
 		} else {
-			if (plusOrMinus) {
-				handleAdditionModeError()
-			} else {
-				handleNormalModeError()
-			}
+			handleNormalModeError()
 		}
 	}
 	// clears the output space as well as the error box from the addition mode space
@@ -197,5 +134,4 @@ app.controller('controller',['$scope', '$http', function ($scope, $http) {
 		$scope.additionOutcome = {}
 		$scope.showError = false
 	}
-
 }])

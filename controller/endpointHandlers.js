@@ -1,14 +1,6 @@
 // requires
 var diceRoller = require("./diceRoller.js")
 
-
-
-
-
-
-
-
-
 // endpoint handlers
 function homePage (req, res) { // loads homepage
 	res.sendFile('/index.html',{root : "./public/html/"})
@@ -26,14 +18,6 @@ function diceExpressionNoProbabilities (req, res) {
 function diceExpressionTestEndpoint (req, res) {
 	res.send({ outcome: diceRoller.rollTheDiceByExpression(req.params.diceExpression, true, true) })
 }
-
-
-
-
-
-
-
-
 
 // exports
 module.exports = {
