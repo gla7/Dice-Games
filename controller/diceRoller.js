@@ -144,7 +144,7 @@ function rollTheDiceByExpression (expression, isEstimatingProbabilities, isTest)
 	var isMultipleDiceCase = expressionDecomposed.length === 3
 	var isDropCase = expressionDecomposed.length === 5 && expressionDecomposed[3] === 'd'
 	var isKeepCase = expressionDecomposed.length === 5 && expressionDecomposed[3] === 'k'
-	// handling each game
+	// handling each case
 	if (isLiteralCase) {
 		return handleLiteralCase(expression, isEstimatingProbabilities, isTest)
 	} else if (isSingleDieCase) {

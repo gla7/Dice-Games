@@ -20,7 +20,7 @@ function generateRandomLetterString (length, charactersAvailable) {
 }
 
 // test parameters/constants
-var NUMBER_OF_TESTS_IN_EACH_CASE = 10
+var NUMBER_OF_TESTS_IN_EACH_CASE = 100
 var LIMIT_OF_LITERAL_VALUE_CASE = 100
 var LIMIT_OF_FACES_IN_DICE = 100
 var LIMIT_OF_NUMBER_OF_DICE = 100
@@ -31,7 +31,7 @@ var invalidLetters = "abcefghijlmnopqrstuvwyzQWERTYUIOPASFFGHJLZCVBNM"
 var numbers = "0123456789"
 var kdx = "kdx"
 
-// tests start here
+// tests begin here
 describe("HOMEPAGE LOAD", function () {
 	it("Test number 1 of 1: should get status 200 when getting the homepage", function (done) {
 		chai.request(app)

@@ -19,7 +19,7 @@ function cloneArray (array) {
 		return item
 	})
 }
-// obtains breakdown of expression for multiple dice roll, drop lowest, and keep highest cases e.g. 
+// obtains breakdown of expression for multiple dice roll, drop lowest, and keep highest cases, e.g.
 // 3d6 => 1d6: 3, 1d6: 1, 1d6: 5 (as an array of strings)
 function getStepByStepEvaluationOfNonExplosionExpression (expression, rolls, useCase, indecesOflowestOrHighestRolls) {
 	var expressionDecomposed = decomposeExpression(expression)

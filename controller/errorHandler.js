@@ -72,5 +72,5 @@ function handleErrors (expression) {
   return null
 }
 
-// exports
+// export
 module.exports = { handleErrors: handleErrors }

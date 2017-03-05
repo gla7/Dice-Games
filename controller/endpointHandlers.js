@@ -5,7 +5,7 @@ var diceRoller = require("./diceRoller.js")
 function homePage (req, res) { // loads homepage
 	res.sendFile('/index.html',{root : "./public/html/"})
 }
-// simulates dice roll as per expression, breakdown, (or error message if applicable) and generates probabilities
+// simulates dice roll for expression, breakdown, (or error message if applicable) and generates probabilities
 function diceExpressionWithProbabilities (req, res) {
 	res.send({ outcome: diceRoller.rollTheDiceByExpression(req.params.diceExpression, false) })
 }

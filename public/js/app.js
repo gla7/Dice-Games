@@ -1,4 +1,4 @@
-// module and dependancy declaration
+// module and dependency declaration
 var app = angular.module('app',["chart.js"])
 
 // controller and directives declaration

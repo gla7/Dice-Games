@@ -4,7 +4,7 @@ var bodyParser = require('body-parser')
 var cors = require('cors')
 var endpointHandlers = require('./controller/endpointHandlers.js')
 
-// express instantiation and basic settings
+// express instantiation and settings
 var app = express()
 
 app.use(cors())
