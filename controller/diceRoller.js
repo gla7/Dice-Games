@@ -2,6 +2,11 @@
 var errorHandler = require('./errorHandler.js')
 var helperFunctions = require('./helperFunctions.js')
 
+// constants
+var APPROXIMATE_ODDS_SAMPLE_SIZE = 25000
+var EXPLODE_CASE_ODD_CALCULATION_DICE_NUMBER_LIMIT = 5
+var EXPLODE_CASE_ODD_CALCULATION_EPLOSION_THRESHOLD_LIMIT = 0.5
+
 // core functions
 Array.prototype.min = function() { return Math.min.apply(null, this) }
 
@@ -12,7 +17,7 @@ Array.prototype.max = function() { return Math.max.apply(null, this) }
 // for these expressions, and as soon as I find a way calculate them analytically I will.
 function getApproximateOddsForExpression (expression) {
 	var probabilities = {}
-	var sampleSize = 25000
+	var sampleSize = APPROXIMATE_ODDS_SAMPLE_SIZE
 	for (var i = 0; i < sampleSize; i++) {
 		if (probabilities[rollTheDiceByExpression(expression, true).result]) {
 			probabilities[rollTheDiceByExpression(expression, true).result] = probabilities[rollTheDiceByExpression(expression, true).result] + 1/sampleSize
@@ -119,7 +124,7 @@ function handleExplodeCase (expression, isEstimatingProbabilities, isTest) {
 	explodeCaseHandled.expressionEvaluated = expression
 	explodeCaseHandled.stepByStepEvaluation = explosiveRolls.stepByStepEvaluation
 	explodeCaseHandled.result = explosiveRolls.result
-	explodeCaseHandled.odds = (!isEstimatingProbabilities && numberOfDice <= 5 && (explosionThreshold/facesInDice) >= 0.5) ? getApproximateOddsForExpression(expression) : null
+	explodeCaseHandled.odds = (!isEstimatingProbabilities && numberOfDice <= EXPLODE_CASE_ODD_CALCULATION_DICE_NUMBER_LIMIT && (explosionThreshold/facesInDice) >= EXPLODE_CASE_ODD_CALCULATION_EPLOSION_THRESHOLD_LIMIT) ? getApproximateOddsForExpression(expression) : null
 	explodeCaseHandled.error = null
 	return explodeCaseHandled
 }

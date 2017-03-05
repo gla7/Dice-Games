@@ -1,6 +1,9 @@
 // requires
 var decomposeExpression = require('./helperFunctions.js').decomposeExpression
 
+// constants
+var LARGE_NUMBER_LIMIT = 100000
+
 // core functions
 // holds the exact error string for each error case
 var showError = {
@@ -33,9 +36,9 @@ function handleErrors (expression) {
 	// all possible errors
 	var isSpecialCharacterError = !expressionDecomposed || expression.length !== expressionDecomposed.join("").length
 	var isLiteralValueCaseCorrection = expressionDecomposed && expressionDecomposed.length === 1 && isNaN(Number(expressionDecomposed[0]))
-	var isSingleDieTooLargeANumber = expressionDecomposed && expressionDecomposed.length === 2 && Number(expressionDecomposed[1]) > 100000
+	var isSingleDieTooLargeANumber = expressionDecomposed && expressionDecomposed.length === 2 && Number(expressionDecomposed[1]) > LARGE_NUMBER_LIMIT
 	var isSingleDieRollCorrection = expressionDecomposed && expressionDecomposed.length === 2 && (Number(expressionDecomposed[1]) === 0 || expressionDecomposed[0] !== 'd')
-	var isMultipleDiceTooLargeANumber = expressionDecomposed && expressionDecomposed.length > 2 && (Number(expressionDecomposed[0]) > 100000 || Number(expressionDecomposed[2]) > 100000)
+	var isMultipleDiceTooLargeANumber = expressionDecomposed && expressionDecomposed.length > 2 && (Number(expressionDecomposed[0]) > LARGE_NUMBER_LIMIT || Number(expressionDecomposed[2]) > LARGE_NUMBER_LIMIT)
 	var isMultipleDiceRollCorrection = expressionDecomposed && expressionDecomposed.length > 2 && (isMultipleDiceInvalidExpression(expression) || Number(expressionDecomposed[0]) === 0 || Number(expressionDecomposed[2]) === 0 || expressionDecomposed[1] !== 'd')
 	var isDropCorrection = expressionDecomposed && expressionDecomposed.length === 5 && expressionDecomposed[3] === 'd' && Number(expressionDecomposed[4]) >= Number(expressionDecomposed[0])
 	var isKeepCorrection = expressionDecomposed && expressionDecomposed.length === 5 && expressionDecomposed[3] === 'k' && (Number(expressionDecomposed[4]) === 0 || Number(expressionDecomposed[4]) > Number(expressionDecomposed[0]))

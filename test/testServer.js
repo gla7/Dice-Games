@@ -3,29 +3,11 @@ var chai = require('chai')
 var chaiHttp = require('chai-http')
 var server = require('../server.js')
 
-
-
-
-
-
-
-
-
-
 // needed by mocha/chai
 var should = chai.should()
 var expect = chai.expect
 var app = server.app
 chai.use(chaiHttp)
-
-
-
-
-
-
-
-
-
 
 // helper functions
 function randomNumberBetweenMAndN (m, n) { return Math.floor(Math.random()*(n - m + 1) + m) }
@@ -37,44 +19,17 @@ function generateRandomLetterString (length, charactersAvailable) {
   return text.trim()
 }
 
-
-
-
-
-
-
-
-
-
-// test parameters
-var numberOfTestsInEachCase = 10
-var limitOfLiteralValueCase = 100
-var limitOfFacesInDice = 100
-var limitOfNumberOfDice = 100
-
-
-
-
-
-
-
-
-
+// test parameters/constants
+var NUMBER_OF_TESTS_IN_EACH_CASE = 10
+var LIMIT_OF_LITERAL_VALUE_CASE = 100
+var LIMIT_OF_FACES_IN_DICE = 100
+var LIMIT_OF_NUMBER_OF_DICE = 100
 
 // test generator helpers
 var notPermittedSymbols = "`~!@$^&*()-_=+[{]}|;:',<>".split("")
 var invalidLetters = "abcefghijlmnopqrstuvwyzQWERTYUIOPASFFGHJLZCVBNM"
 var numbers = "0123456789"
 var kdx = "kdx"
-
-
-
-
-
-
-
-
-
 
 // tests start here
 describe("HOMEPAGE LOAD", function () {
@@ -90,9 +45,9 @@ describe("HOMEPAGE LOAD", function () {
 })
 
 describe("LITERAL VALUE CASE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var nonNegativeInteger = Math.round(Math.random()*limitOfLiteralValueCase)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result of " + nonNegativeInteger + ", when getting /diceExpression/testEndpoint/" + nonNegativeInteger, function (done) {
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var nonNegativeInteger = Math.round(Math.random()*LIMIT_OF_LITERAL_VALUE_CASE)
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, no error message, and a result of " + nonNegativeInteger + ", when getting /diceExpression/testEndpoint/" + nonNegativeInteger, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + nonNegativeInteger)
 			.end(function (err, res) {
@@ -108,9 +63,9 @@ describe("LITERAL VALUE CASE", function () {
 })
 
 describe("NEGATIVE LITERAL VALUE CASE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var negativeInteger = - Math.round(Math.random()*limitOfLiteralValueCase)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a no special symbols error message when getting /diceExpression/testEndpoint/" + negativeInteger, function (done) {
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var negativeInteger = - Math.round(Math.random()*LIMIT_OF_LITERAL_VALUE_CASE)
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a no special symbols error message when getting /diceExpression/testEndpoint/" + negativeInteger, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + negativeInteger)
 			.end(function (err, res) {
@@ -139,9 +94,9 @@ describe("NO SPECIAL SYMBOLS", function () {
 })
 
 describe("NOT JUST LETTERS", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
 		var randomStringOfLetters = generateRandomLetterString(randomNumberBetweenMAndN(1, 100), invalidLetters)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a literal value case error when getting /diceExpression/testEndpoint/" + randomStringOfLetters, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a literal value case error when getting /diceExpression/testEndpoint/" + randomStringOfLetters, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + randomStringOfLetters)
 			.end(function (err, res) {
@@ -155,9 +110,9 @@ describe("NOT JUST LETTERS", function () {
 })
 
 describe("NOT JUST INVALID LETTERS AND NUMBERS", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
 		var randomStringOfLettersAndNumbers = generateRandomLetterString(randomNumberBetweenMAndN(1, 100), invalidLetters + numbers)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and an error message when getting /diceExpression/testEndpoint/" + randomStringOfLettersAndNumbers, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and an error message when getting /diceExpression/testEndpoint/" + randomStringOfLettersAndNumbers, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + randomStringOfLettersAndNumbers)
 			.end(function (err, res) {
@@ -171,9 +126,9 @@ describe("NOT JUST INVALID LETTERS AND NUMBERS", function () {
 })
 
 describe("ONE DIE ROLL CASE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result between 1 and " + facesInDice + ",  when getting /diceExpression/testEndpoint/d" + facesInDice, function (done) {
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, no error message, and a result between 1 and " + facesInDice + ",  when getting /diceExpression/testEndpoint/d" + facesInDice, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/d" + facesInDice)
 			.end(function (err, res) {
@@ -203,9 +158,9 @@ describe("ZERO FACED ONE DIE ROLL CASE", function () {
 })
 
 describe("ONE DIE ROLL CASE ERROR", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
 		var invalidLetterAndNumbers = generateRandomLetterString(1, invalidLetters) + randomNumberBetweenMAndN(1, 1000)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a single die roll error message when getting /diceExpression/testEndpoint/" + invalidLetterAndNumbers, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a single die roll error message when getting /diceExpression/testEndpoint/" + invalidLetterAndNumbers, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + invalidLetterAndNumbers)
 			.end(function (err, res) {
@@ -219,10 +174,10 @@ describe("ONE DIE ROLL CASE ERROR", function () {
 })
 
 describe("DICE ROLL CASE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
-		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result between " + numberOfDice + " and " + facesInDice*numberOfDice + ",  when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice, function (done) {
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
+		var numberOfDice = randomNumberBetweenMAndN(1, LIMIT_OF_NUMBER_OF_DICE)
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, no error message, and a result between " + numberOfDice + " and " + facesInDice*numberOfDice + ",  when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice)
 			.end(function (err, res) {
@@ -238,10 +193,10 @@ describe("DICE ROLL CASE", function () {
 })
 
 describe("TOO LARGE NUMBER IN FACES", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
 		var facesInDice = randomNumberBetweenMAndN(100001, 1000000)
-		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a too large number error when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice, function (done) {
+		var numberOfDice = randomNumberBetweenMAndN(1, LIMIT_OF_NUMBER_OF_DICE)
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a too large number error when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice)
 			.end(function (err, res) {
@@ -255,10 +210,10 @@ describe("TOO LARGE NUMBER IN FACES", function () {
 })
 
 describe("TOO LARGE NUMBER IN NUMBER OF DICE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
 		var numberOfDice = randomNumberBetweenMAndN(100001, 1000000)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a too large number error when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a too large number error when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice)
 			.end(function (err, res) {
@@ -272,13 +227,13 @@ describe("TOO LARGE NUMBER IN NUMBER OF DICE", function () {
 })
 
 describe("INPUT IN WRONG ORDER CASE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
 		var firstRandomNumber = randomNumberBetweenMAndN(1, 1000)
 		var secondRandomNumber = randomNumberBetweenMAndN(1, 1000)
 		var firstSetOfRandomLetters = generateRandomLetterString(Math.random()*100, invalidLetters)
 		var secondSetOfRandomLetters = generateRandomLetterString(Math.random()*100, invalidLetters)
 		var thirdSetOfRandomLetters = generateRandomLetterString(Math.random()*100, invalidLetters)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a multiple dice error message when getting /diceExpression/testEndpoint/" + firstSetOfRandomLetters + firstRandomNumber + secondSetOfRandomLetters + secondRandomNumber + thirdSetOfRandomLetters, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a multiple dice error message when getting /diceExpression/testEndpoint/" + firstSetOfRandomLetters + firstRandomNumber + secondSetOfRandomLetters + secondRandomNumber + thirdSetOfRandomLetters, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + firstSetOfRandomLetters + firstRandomNumber + secondSetOfRandomLetters + secondRandomNumber + thirdSetOfRandomLetters)
 			.end(function (err, res) {
@@ -292,12 +247,12 @@ describe("INPUT IN WRONG ORDER CASE", function () {
 })
 
 describe("TOO MUCH INPUT CASE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
 		var firstRandomNumber = randomNumberBetweenMAndN(1, 1000)
 		var secondRandomNumber = randomNumberBetweenMAndN(1, 1000)
 		var thirdRandomNumber = randomNumberBetweenMAndN(1, 1000)
 		var fourthRandomNumber = randomNumberBetweenMAndN(1, 1000)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a too much input error message when getting /diceExpression/testEndpoint/" + firstRandomNumber + "d" + secondRandomNumber + "d" + thirdRandomNumber + "d" + fourthRandomNumber, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a too much input error message when getting /diceExpression/testEndpoint/" + firstRandomNumber + "d" + secondRandomNumber + "d" + thirdRandomNumber + "d" + fourthRandomNumber, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + firstRandomNumber + "d" + secondRandomNumber + "d" + thirdRandomNumber + "d" + fourthRandomNumber)
 			.end(function (err, res) {
@@ -311,10 +266,10 @@ describe("TOO MUCH INPUT CASE", function () {
 })
 
 describe("DICE ROLL CASE NOT WITH d IN THE MIDDLE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
-		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a multiple dice error message when getting /diceExpression/testEndpoint/" + numberOfDice + generateRandomLetterString(1, invalidLetters) + facesInDice, function (done) {
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
+		var numberOfDice = randomNumberBetweenMAndN(1, LIMIT_OF_NUMBER_OF_DICE)
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a multiple dice error message when getting /diceExpression/testEndpoint/" + numberOfDice + generateRandomLetterString(1, invalidLetters) + facesInDice, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + generateRandomLetterString(1, invalidLetters) + facesInDice)
 			.end(function (err, res) {
@@ -328,10 +283,10 @@ describe("DICE ROLL CASE NOT WITH d IN THE MIDDLE", function () {
 })
 
 describe("ZERO FACE DICE ROLL CASE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
 		var facesInDice = 0
-		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a multiple dice roll error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice, function (done) {
+		var numberOfDice = randomNumberBetweenMAndN(1, LIMIT_OF_NUMBER_OF_DICE)
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a multiple dice roll error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice)
 			.end(function (err, res) {
@@ -345,10 +300,10 @@ describe("ZERO FACE DICE ROLL CASE", function () {
 })
 
 describe("ZERO DICE ROLL CASE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
 		var numberOfDice = 0
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a multiple dice roll error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a multiple dice roll error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice)
 			.end(function (err, res) {
@@ -362,12 +317,12 @@ describe("ZERO DICE ROLL CASE", function () {
 })
 
 describe("NOT K D OR X", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
-		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
+		var numberOfDice = randomNumberBetweenMAndN(1, LIMIT_OF_NUMBER_OF_DICE)
 		var thirdNumber = randomNumberBetweenMAndN(0, numberOfDice - 1)
 		var notKdx = generateRandomLetterString(1, invalidLetters)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a not using k d or x error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + notKdx + thirdNumber, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a not using k d or x error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + notKdx + thirdNumber, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + notKdx + thirdNumber)
 			.end(function (err, res) {
@@ -381,12 +336,12 @@ describe("NOT K D OR X", function () {
 })
 
 describe("ZERO FACES IN K D OR X", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
 		var facesInDice = 0
-		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
+		var numberOfDice = randomNumberBetweenMAndN(1, LIMIT_OF_NUMBER_OF_DICE)
 		var thirdNumber = randomNumberBetweenMAndN(0, numberOfDice - 1)
 		var kDOrX = generateRandomLetterString(1, kdx)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a multiple dice error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + kDOrX + thirdNumber, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a multiple dice error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + kDOrX + thirdNumber, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + kDOrX + thirdNumber)
 			.end(function (err, res) {
@@ -400,12 +355,12 @@ describe("ZERO FACES IN K D OR X", function () {
 })
 
 describe("ZERO DICE IN K D OR X", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
 		var numberOfDice = 0
 		var thirdNumber = randomNumberBetweenMAndN(0, numberOfDice - 1)
 		var kDOrX = generateRandomLetterString(1, kdx)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a multiple dice error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + kDOrX + thirdNumber, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a multiple dice error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + kDOrX + thirdNumber, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + kDOrX + thirdNumber)
 			.end(function (err, res) {
@@ -419,11 +374,11 @@ describe("ZERO DICE IN K D OR X", function () {
 })
 
 describe("DROP LOWEST ROLLS CASE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
-		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
+		var numberOfDice = randomNumberBetweenMAndN(1, LIMIT_OF_NUMBER_OF_DICE)
 		var resultsDropped = randomNumberBetweenMAndN(0, numberOfDice - 1)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result between " + (numberOfDice - resultsDropped) + " and " + facesInDice*(numberOfDice - resultsDropped) + ", when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "d" + resultsDropped, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, no error message, and a result between " + (numberOfDice - resultsDropped) + " and " + facesInDice*(numberOfDice - resultsDropped) + ", when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "d" + resultsDropped, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "d" + resultsDropped)
 			.end(function (err, res) {
@@ -439,11 +394,11 @@ describe("DROP LOWEST ROLLS CASE", function () {
 })
 
 describe("DROP LOWEST ROLLS CASE WITH D >= THE NUMBER OF DICE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
-		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
+		var numberOfDice = randomNumberBetweenMAndN(1, LIMIT_OF_NUMBER_OF_DICE)
 		var resultsDropped = randomNumberBetweenMAndN(numberOfDice, numberOfDice + 100)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a drop error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "d" + resultsDropped, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a drop error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "d" + resultsDropped, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "d" + resultsDropped)
 			.end(function (err, res) {
@@ -457,11 +412,11 @@ describe("DROP LOWEST ROLLS CASE WITH D >= THE NUMBER OF DICE", function () {
 })
 
 describe("KEEP HIGHEST ROLLS CASE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
-		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
+		var numberOfDice = randomNumberBetweenMAndN(1, LIMIT_OF_NUMBER_OF_DICE)
 		var resultsKept = randomNumberBetweenMAndN(1, numberOfDice)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result between " + resultsKept + " and " + facesInDice*resultsKept + ", when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "k" + resultsKept, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, no error message, and a result between " + resultsKept + " and " + facesInDice*resultsKept + ", when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "k" + resultsKept, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "k" + resultsKept)
 			.end(function (err, res) {
@@ -477,10 +432,10 @@ describe("KEEP HIGHEST ROLLS CASE", function () {
 })
 
 describe("KEEP HIGHEST ROLLS CASE WITH K = 0 OR ABOVE THE NUMBER OF DICE", function () {
-	var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
-	var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
+	var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
+	var numberOfDice = randomNumberBetweenMAndN(1, LIMIT_OF_NUMBER_OF_DICE)
 	var resultsKept = 0
-	it("Test number 1 of " + (numberOfTestsInEachCase + 1) + ": should get status 200, and a keep error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "k" + resultsKept, function (done) {
+	it("Test number 1 of " + (NUMBER_OF_TESTS_IN_EACH_CASE + 1) + ": should get status 200, and a keep error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "k" + resultsKept, function (done) {
 		chai.request(app)
 		.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "k" + resultsKept)
 		.end(function (err, res) {
@@ -490,11 +445,11 @@ describe("KEEP HIGHEST ROLLS CASE WITH K = 0 OR ABOVE THE NUMBER OF DICE", funct
 			done()
 		})
 	})
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
-		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
+		var numberOfDice = randomNumberBetweenMAndN(1, LIMIT_OF_NUMBER_OF_DICE)
 		var resultsKept = randomNumberBetweenMAndN(numberOfDice + 1, numberOfDice + 100)
-		it("Test number " + (i + 2) + " of " + (numberOfTestsInEachCase + 1) + ": should get status 200, and a keep error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "k" + resultsKept, function (done) {
+		it("Test number " + (i + 2) + " of " + (NUMBER_OF_TESTS_IN_EACH_CASE + 1) + ": should get status 200, and a keep error message when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "k" + resultsKept, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "k" + resultsKept)
 			.end(function (err, res) {
@@ -508,11 +463,11 @@ describe("KEEP HIGHEST ROLLS CASE WITH K = 0 OR ABOVE THE NUMBER OF DICE", funct
 })
 
 describe("EXPLOSIVE ROLLS CASE", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
-		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
+		var numberOfDice = randomNumberBetweenMAndN(1, LIMIT_OF_NUMBER_OF_DICE)
 		var explosionThreshold = randomNumberBetweenMAndN(2, facesInDice)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, no error message, and a result between " + numberOfDice + " and infinity, when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "x" + explosionThreshold, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, no error message, and a result between " + numberOfDice + " and infinity, when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "x" + explosionThreshold, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "x" + explosionThreshold)
 			.end(function (err, res) {
@@ -527,11 +482,11 @@ describe("EXPLOSIVE ROLLS CASE", function () {
 })
 
 describe("EXPLOSIVE ROLLS CASE WITH X = 1 OR BELOW", function () {
-	for (var i = 0; i < numberOfTestsInEachCase; i++) {
-		var facesInDice = randomNumberBetweenMAndN(1, limitOfFacesInDice)
-		var numberOfDice = randomNumberBetweenMAndN(1, limitOfNumberOfDice)
+	for (var i = 0; i < NUMBER_OF_TESTS_IN_EACH_CASE; i++) {
+		var facesInDice = randomNumberBetweenMAndN(1, LIMIT_OF_FACES_IN_DICE)
+		var numberOfDice = randomNumberBetweenMAndN(1, LIMIT_OF_NUMBER_OF_DICE)
 		var explosionThreshold = randomNumberBetweenMAndN(0, 1)
-		it("Test number " + (i + 1) + " of " + numberOfTestsInEachCase + ": should get status 200, and a no 1 or below x's error when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "x" + explosionThreshold, function (done) {
+		it("Test number " + (i + 1) + " of " + NUMBER_OF_TESTS_IN_EACH_CASE + ": should get status 200, and a no 1 or below x's error when getting /diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "x" + explosionThreshold, function (done) {
 			chai.request(app)
 			.get("/diceExpression/testEndpoint/" + numberOfDice + "d" + facesInDice + "x" + explosionThreshold)
 			.end(function (err, res) {
